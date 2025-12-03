@@ -8,7 +8,7 @@
 **Instrucciones para el Asistente de IA (Gemini CLI)**
 - Este documento es la **única fuente de verdad**.
 - Prioriza los requisitos marcados en **ROJO** en la documentación original (Sección 2.1).
-- El sistema debe funcionar en WAMP pero estar listo para Docker.
+- El sistema debe funcionar en WAMP.
 
 ---
 
@@ -53,7 +53,7 @@
 
 ---
 
-**Sección 3: Estructura de Archivos (WAMP -> Docker Ready)**
+**Sección 3: Estructura de Archivos**
 
 ```text
 /sistema-rastro

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controllers;
 
@@ -37,7 +38,6 @@ class UserController extends BaseController
             if ($user && password_verify($password, $user->getPasswordHash()) && $user->isActivo()) {
                 // Login successful
                 // In a real application, start session, set cookies, etc.
-                session_start();
                 $_SESSION['user_id'] = $user->getId();
                 $_SESSION['username'] = $user->getNombreUsuario();
                 $_SESSION['role_id'] = $user->getRolId();
@@ -58,7 +58,6 @@ class UserController extends BaseController
      */
     public function logout(): void
     {
-        session_start();
         session_unset();
         session_destroy();
         $this->redirect('/login');
@@ -69,12 +68,7 @@ class UserController extends BaseController
      */
     public function index(): void
     {
-        // Basic authorization check (e.g., must be admin)
-        session_start();
-        if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) { // Assuming role_id 1 is Admin
-            $this->redirect('/login');
-            return;
-        }
+        $this->authorizeAdmin();
 
         $users = User::findAll();
         $this->view('admin/users/index', ['users' => $users]);
@@ -85,11 +79,7 @@ class UserController extends BaseController
      */
     public function create(): void
     {
-        session_start();
-        if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) {
-            $this->redirect('/login');
-            return;
-        }
+        $this->authorizeAdmin();
         $this->view('admin/users/create_edit'); // Use a generic form for create/edit
     }
 
@@ -98,11 +88,7 @@ class UserController extends BaseController
      */
     public function store(): void
     {
-        session_start();
-        if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) {
-            $this->redirect('/login');
-            return;
-        }
+        $this->authorizeAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = Sanitizer::sanitizeArray($_POST); // Sanitize all POST data
@@ -152,11 +138,7 @@ class UserController extends BaseController
      */
     public function edit(int $id): void
     {
-        session_start();
-        if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) {
-            $this->redirect('/login');
-            return;
-        }
+        $this->authorizeAdmin();
 
         $user = User::findById($id);
         if (!$user) {
@@ -172,11 +154,7 @@ class UserController extends BaseController
      */
     public function deactivate(int $id): void
     {
-        session_start();
-        if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) {
-            $this->redirect('/login');
-            return;
-        }
+        $this->authorizeAdmin();
 
         $user = User::findById($id);
         if ($user && $user->softDelete()) {
@@ -191,11 +169,7 @@ class UserController extends BaseController
      */
     public function activate(int $id): void
     {
-        session_start();
-        if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) {
-            $this->redirect('/login');
-            return;
-        }
+        $this->authorizeAdmin();
 
         $user = User::findById($id);
         if ($user) {

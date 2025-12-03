@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
-namespace Config;
+namespace App\Config;
 
 use PDO;
 use PDOException;
+use App\Core\ErrorHandler;
 
 class Database
 {
@@ -28,11 +30,9 @@ class Database
         try {
             $this->pdo = new PDO($dsn, $this->username, $this->password, $options);
         } catch (PDOException $e) {
-            // En un entorno de producción, loguear el error y no mostrarlo directamente.
-            // Por ahora, para desarrollo, podemos mostrarlo.
-            // Deberíamos usar IErrorHandler aquí, pero aún no tenemos una implementación concreta de un logger.
-            error_log("Error de conexión a la base de datos: " . $e->getMessage());
-            die("Error de conexión a la base de datos.");
+            // Relanzar la excepción para que sea capturada por nuestro manejador de excepciones global.
+            // Esto detendrá la ejecución y mostrará una página de error amigable.
+            throw $e;
         }
     }
 

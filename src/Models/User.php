@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
-use Config\Database;
+use App\Config\Database;
 use PDO;
 use App\Helpers\Sanitizer;
 
@@ -214,5 +215,15 @@ class User
             );
         }
         return $users;
+    }
+
+    /**
+     * Counts the total number of users.
+     */
+    public static function count(): int
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->query("SELECT COUNT(*) FROM usuarios");
+        return (int)$stmt->fetchColumn();
     }
 }

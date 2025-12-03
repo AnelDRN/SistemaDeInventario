@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 -- Insertar usuario admin por defecto (admin / root2514)
 -- La contraseña 'root2514' debe ser hasheada con password_hash('root2514', PASSWORD_DEFAULT) en PHP
 INSERT IGNORE INTO `usuarios` (`id`, `nombre_usuario`, `email`, `password_hash`, `rol_id`, `activo`) VALUES
-(1, 'admin', 'admin@sistema.com', '$2y$10$w0B0hR1XfL8/Xg7wE.2j.u1H7oN4p/y.9xJ0o0l0k0i0h0g0f0e0d0c0b0a0', 1, TRUE); -- Hash de 'root2514'
+(1, 'admin', 'admin@sistema.com', '$2y$12$Q/O1TvLOAfTCRptJC68U1uV74/awhLjb9jEnKFnPLA2iXrnj9SEpa', 1, TRUE); -- Hash de 'root2514'
 
 --
 -- Estructura de la tabla `secciones`

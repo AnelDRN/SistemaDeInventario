@@ -29,7 +29,7 @@
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
-            <form action="/login" method="POST">
+            <form action="login.php" method="POST">
                 <div class="mb-3">
                     <label for="username" class="form-label">Usuario:</label>
                     <input type="text" class="form-control" id="username" name="username" required>
