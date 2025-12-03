@@ -28,6 +28,21 @@ class Part
 
     public function __construct() {
         $this->pdo = Database::getInstance()->getConnection();
+        // Inicializar propiedades para evitar errores de "uninitialized" en PHP 8+
+        $this->id = null;
+        $this->nombre = '';
+        $this->descripcion = null;
+        $this->tipo_parte = null;
+        $this->marca_auto = null;
+        $this->modelo_auto = null;
+        $this->año_auto = null;
+        $this->precio = 0.0;
+        $this->cantidad_disponible = 0;
+        $this->imagen_url = null;
+        $this->thumbnail_url = null;
+        $this->seccion_id = 0;
+        $this->fecha_creacion = null;
+        $this->fecha_actualizacion = null;
     }
 
     // --- Getters ---

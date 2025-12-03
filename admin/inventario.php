@@ -23,6 +23,14 @@ if (!empty($searchTerm)) {
     $parts = Part::findAll();
 }
 
+// --- DEBUGGING ---
+echo "Término de búsqueda: " . htmlspecialchars($searchTerm);
+echo "<pre>";
+var_dump($parts);
+echo "</pre>";
+exit();
+// --- FIN DEBUGGING ---
+
 $sections = Section::findAll();
 
 // Crear un mapa de ID de sección a nombre para fácil acceso en la vista
