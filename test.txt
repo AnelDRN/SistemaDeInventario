@@ -1,0 +1,93 @@
+Término de búsqueda:
+C:\wamp64\www\SistemaDeInventario\SistemaDeInventario\admin\inventario.php:29:
+array (size=5)
+  0 => 
+    object(App\Models\Part)[5]
+      private ?int 'id' => int 1
+      private string 'nombre' => string 'Faro Delantero Izquierdo' (length=24)
+      private ?string 'descripcion' => string 'Faro de halógeno original, en buenas condiciones, con leves signos de uso.' (length=75)
+      private ?string 'tipo_parte' => string 'Iluminación' (length=12)
+      private ?string 'marca_auto' => string 'Honda' (length=5)
+      private ?string 'modelo_auto' => string 'Civic' (length=5)
+      private ?int 'año_auto' => int 2018
+      private float 'precio' => float 120.5
+      private int 'cantidad_disponible' => int 4
+      private ?string 'imagen_url' => string 'https://placehold.co/800x600/EEE/31343C.png?text=Faro+Honda+Civic' (length=65)
+      private ?string 'thumbnail_url' => string 'https://placehold.co/400x300/EEE/31343C.png?text=Faro' (length=53)
+      private int 'seccion_id' => int 1
+      private ?string 'fecha_creacion' => string '2025-12-02 22:07:21' (length=19)
+      private ?string 'fecha_actualizacion' => string '2025-12-02 22:43:08' (length=19)
+      private PDO 'pdo' => 
+        object(PDO)[3]
+  1 => 
+    object(App\Models\Part)[6]
+      private ?int 'id' => int 2
+      private string 'nombre' => string 'Puerta del Conductor' (length=20)
+      private ?string 'descripcion' => string 'Puerta completa con panel interior y vidrio. Color rojo. Sin golpes mayores.' (length=76)
+      private ?string 'tipo_parte' => string 'Carrocería' (length=11)
+      private ?string 'marca_auto' => string 'Toyota' (length=6)
+      private ?string 'modelo_auto' => string 'Corolla' (length=7)
+      private ?int 'año_auto' => int 2016
+      private float 'precio' => float 350
+      private int 'cantidad_disponible' => int 2
+      private ?string 'imagen_url' => string 'https://placehold.co/800x600/EEE/31343C.png?text=Puerta+Toyota' (length=62)
+      private ?string 'thumbnail_url' => string 'https://placehold.co/400x300/EEE/31343C.png?text=Puerta' (length=55)
+      private int 'seccion_id' => int 2
+      private ?string 'fecha_creacion' => string '2025-12-02 22:07:21' (length=19)
+      private ?string 'fecha_actualizacion' => string '2025-12-02 22:07:21' (length=19)
+      private PDO 'pdo' => 
+        object(PDO)[3]
+  2 => 
+    object(App\Models\Part)[7]
+      private ?int 'id' => int 3
+      private string 'nombre' => string 'Alternador 90A' (length=14)
+      private ?string 'descripcion' => string 'Alternador remanufacturado, probado y funcional. Compatible con varios modelos de Ford.' (length=87)
+      private ?string 'tipo_parte' => string 'Eléctrico' (length=10)
+      private ?string 'marca_auto' => string 'Ford' (length=4)
+      private ?string 'modelo_auto' => string 'Focus' (length=5)
+      private ?int 'año_auto' => int 2014
+      private float 'precio' => float 95.75
+      private int 'cantidad_disponible' => int 8
+      private ?string 'imagen_url' => string 'https://placehold.co/800x600/EEE/31343C.png?text=Alternador+Ford' (length=64)
+      private ?string 'thumbnail_url' => string 'https://placehold.co/400x300/EEE/31343C.png?text=Alternador' (length=59)
+      private int 'seccion_id' => int 1
+      private ?string 'fecha_creacion' => string '2025-12-02 22:07:21' (length=19)
+      private ?string 'fecha_actualizacion' => string '2025-12-02 22:07:21' (length=19)
+      private PDO 'pdo' => 
+        object(PDO)[3]
+  3 => 
+    object(App\Models\Part)[8]
+      private ?int 'id' => int 4
+      private string 'nombre' => string 'Llanta de Repuesto' (length=18)
+      private ?string 'descripcion' => string 'Llanta de repuesto de tamaño completo, nunca usada. Marca Michelin 205/55 R16.' (length=79)
+      private ?string 'tipo_parte' => string 'Llantas' (length=7)
+      private ?string 'marca_auto' => string 'Volkswagen' (length=10)
+      private ?string 'modelo_auto' => string 'Jetta' (length=5)
+      private ?int 'año_auto' => int 2020
+      private float 'precio' => float 80
+      private int 'cantidad_disponible' => int 1
+      private ?string 'imagen_url' => string 'https://placehold.co/800x600/EEE/31343C.png?text=Llanta+VW+Jetta' (length=64)
+      private ?string 'thumbnail_url' => string 'https://placehold.co/400x300/EEE/31343C.png?text=Llanta' (length=55)
+      private int 'seccion_id' => int 4
+      private ?string 'fecha_creacion' => string '2025-12-02 22:07:21' (length=19)
+      private ?string 'fecha_actualizacion' => string '2025-12-02 22:07:21' (length=19)
+      private PDO 'pdo' => 
+        object(PDO)[3]
+  4 => 
+    object(App\Models\Part)[9]
+      private ?int 'id' => int 5
+      private string 'nombre' => string 'Caja de Transmisión Automática' (length=32)
+      private ?string 'descripcion' => string 'Transmisión automática de 6 velocidades, extraída de un vehículo con bajo kilometraje.' (length=90)
+      private ?string 'tipo_parte' => string 'Transmisión' (length=12)
+      private ?string 'marca_auto' => string 'Nissan' (length=6)
+      private ?string 'modelo_auto' => string 'Sentra' (length=6)
+      private ?int 'año_auto' => int 2019
+      private float 'precio' => float 950
+      private int 'cantidad_disponible' => int 1
+      private ?string 'imagen_url' => string 'https://placehold.co/800x600/EEE/31343C.png?text=Transmision+Nissan' (length=67)
+      private ?string 'thumbnail_url' => string 'https://placehold.co/400x300/EEE/31343C.png?text=Transmision' (length=60)
+      private int 'seccion_id' => int 3
+      private ?string 'fecha_creacion' => string '2025-12-02 22:07:21' (length=19)
+      private ?string 'fecha_actualizacion' => string '2025-12-02 22:07:21' (length=19)
+      private PDO 'pdo' => 
+        object(PDO)[3]

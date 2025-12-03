@@ -56,4 +56,5 @@
 </nav>
 
 <main class="container mt-4">
+    <?php \App\Helpers\FlashMessage::displayMessage(); ?>
     <!-- El contenido de la página específica se insertará aquí -->

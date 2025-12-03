@@ -2,9 +2,9 @@
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 use App\Models\Comment;
+use App\Helpers\FlashMessage;
 
 // --- Controlador de Acciones de Comentarios ---
-
 // 1. Proteger la página
 if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) {
     header('Location: ../login.php');
@@ -27,13 +27,19 @@ if ($comment) {
     // 4. Ejecutar la acción
     switch ($action) {
         case 'approve':
-            $comment->updateStatus('aprobado');
+            if ($comment->updateStatus('aprobado')) {
+                FlashMessage::setMessage('Comentario aprobado.', 'success');
+            }
             break;
         case 'reject':
-            $comment->updateStatus('rechazado');
+            if ($comment->updateStatus('rechazado')) {
+                FlashMessage::setMessage('Comentario rechazado.', 'warning');
+            }
             break;
         case 'delete':
-            $comment->delete();
+            if ($comment->delete()) {
+                FlashMessage::setMessage('Comentario eliminado permanentemente.', 'danger');
+            }
             break;
     }
 }

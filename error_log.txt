@@ -1,0 +1,6 @@
+[2025-12-03 04:13:47] ERROR: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '?ño_auto, ?, ?, ?, ?, ?)' at line 2 in C:\wamp64\www\SDI\SistemaDeInventario\src\Models\Part.php:171
+Stack trace:
+#0 C:\wamp64\www\SDI\SistemaDeInventario\src\Models\Part.php(171): PDO->prepare('INSERT INTO par...')
+#1 C:\wamp64\www\SDI\SistemaDeInventario\admin\inventario_form.php(89): App\Models\Part->save()
+#2 {main}
+

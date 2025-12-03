@@ -2,6 +2,7 @@
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 use App\Models\User;
+use App\Helpers\FlashMessage;
 
 // --- Controlador de Acciones de Usuario (Activar/Desactivar) ---
 
@@ -27,15 +28,20 @@ if ($user) {
     // 4. Ejecutar la acción
     switch ($action) {
         case 'deactivate':
-            $user->softDelete();
+            if ($user->softDelete()) {
+                FlashMessage::setMessage('Usuario desactivado con éxito.', 'warning');
+            }
             break;
         case 'activate':
             $user->setActivo(true);
-            $user->save();
+            if ($user->save()) {
+                FlashMessage::setMessage('Usuario activado con éxito.', 'success');
+            }
             break;
     }
 }
 
 // 5. Redirigir de vuelta a la lista de usuarios
+FlashMessage::setMessage('Acción completada.', 'info');
 header('Location: usuarios.php');
 exit();

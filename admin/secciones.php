@@ -3,9 +3,9 @@ require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 use App\Models\Section;
 use App\Helpers\Sanitizer;
+use App\Helpers\FlashMessage;
 
 // --- Controlador de Gestión de Secciones ---
-
 // 1. Proteger la página
 if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] !== 1) {
     header('Location: ../login.php');
@@ -31,7 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($section) {
                 $section->setNombre($nombre);
                 $section->setDescripcion($descripcion);
-                if (!$section->save()) {
+                if ($section->save()) {
+                    FlashMessage::setMessage('Sección guardada con éxito.', 'success');
+                } else {
                     $errors[] = 'Error al guardar la sección.';
                 }
             } else {
@@ -41,7 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'delete') {
         $section = Section::findById($id);
         if ($section) {
-            if (!$section->delete()) {
+            if ($section->delete()) {
+                FlashMessage::setMessage('Sección eliminada con éxito.', 'warning');
+            } else {
                 $errors[] = 'Error al eliminar la sección. Es posible que esté en uso por alguna parte del inventario.';
             }
         }

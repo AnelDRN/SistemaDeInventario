@@ -3,6 +3,7 @@ require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 use App\Models\Role;
 use App\Helpers\Sanitizer;
+use App\Helpers\FlashMessage;
 
 // --- Controlador de Gestión de Roles ---
 
@@ -29,7 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $role = $id ? Role::findById($id) : new Role();
             if ($role) {
                 $role->setNombre($nombre);
-                if (!$role->save()) {
+                if ($role->save()) {
+                    FlashMessage::setMessage('Rol guardado con éxito.', 'success');
+                } else {
                     $errors[] = 'Error al guardar el rol.';
                 }
             } else {
@@ -41,16 +44,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($role) {
             // No permitir eliminar los primeros 3 roles (Admin, Vendedor, Cliente)
             if ($role->getId() <= 3) {
-                 $errors[] = 'No se pueden eliminar los roles básicos del sistema.';
+                 FlashMessage::setMessage('No se pueden eliminar los roles básicos del sistema.', 'danger');
             } else {
-                if (!$role->delete()) {
+                if ($role->delete()) {
+                    FlashMessage::setMessage('Rol eliminado con éxito.', 'warning');
+                } else {
                     $errors[] = 'Error al eliminar el rol. Es posible que esté en uso.';
                 }
             }
         }
     }
     
-    // Si hubo una acción POST, recargar la página para limpiar la URL y mostrar los cambios.
+    // Si no hubo errores en la acción POST, recargar la página para limpiar la URL y mostrar los cambios.
     if(empty($errors)) {
         header('Location: roles.php');
         exit();

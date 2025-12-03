@@ -2,9 +2,9 @@
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 use App\Models\Part;
+use App\Helpers\FlashMessage;
 
 // --- Controlador de Acciones de Inventario (Eliminar) ---
-
 // 1. Proteger la página
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
@@ -30,6 +30,7 @@ if ($part) {
 
     // 5. Eliminar el registro de la base de datos
     if ($part->delete()) {
+        FlashMessage::setMessage('Parte del inventario eliminada con éxito.', 'warning');
         // 6. Si se borró de la BD, eliminar los archivos de imagen del servidor
         if ($imageUrl && file_exists(ROOT_PATH . '/' . $imageUrl)) {
             unlink(ROOT_PATH . '/' . $imageUrl);
@@ -37,6 +38,8 @@ if ($part) {
         if ($thumbUrl && file_exists(ROOT_PATH . '/' . $thumbUrl)) {
             unlink(ROOT_PATH . '/' . $thumbUrl);
         }
+    } else {
+        FlashMessage::setMessage('Error al eliminar la parte del inventario.', 'danger');
     }
     // Si la eliminación de la BD falla, no hacemos nada con los archivos y simplemente redirigimos.
     // Se podría añadir un mensaje de error a la sesión para mostrarlo en la lista.

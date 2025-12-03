@@ -5,9 +5,9 @@ use App\Models\Part;
 use App\Models\Sale;
 use App\Helpers\Sanitizer;
 use App\Config\Database;
+use App\Helpers\FlashMessage;
 
 // --- Controlador del Formulario de Venta ---
-
 // 1. Proteger la página
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // 3. Si todo fue bien, confirmar la transacción
             $pdo->commit();
 
-            // Redirigir a la lista de inventario (con un mensaje de éxito sería ideal)
+            FlashMessage::setMessage('Venta registrada con éxito.', 'success');
             header('Location: inventario.php');
             exit();
 
@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Si algo falló, revertir la transacción
             $pdo->rollBack();
             $errors[] = "Error al procesar la venta: " . $e->getMessage();
+            FlashMessage::setMessage('Error al procesar la venta.', 'danger');
         }
     }
 }

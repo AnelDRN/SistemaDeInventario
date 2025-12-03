@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `partes` (
     `tipo_parte` VARCHAR(100), -- Ej. Puerta, Motor, Faro
     `marca_auto` VARCHAR(100),
     `modelo_auto` VARCHAR(100),
-    `año_auto` INT,
+    `anio_auto` INT,
     `precio` DECIMAL(10, 2) NOT NULL,
     `cantidad_disponible` INT NOT NULL DEFAULT 0,
     `imagen_url` VARCHAR(255), -- Ruta a la imagen grande

@@ -5,9 +5,9 @@ use App\Models\Part;
 use App\Models\Section;
 use App\Helpers\Sanitizer;
 use App\Helpers\ImageHelper;
+use App\Helpers\FlashMessage;
 
 // --- Controlador del Formulario de Inventario ---
-
 // 1. Proteger la página
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $part->setTipoParte($data['tipo_parte'] ?? null);
     $part->setMarcaAuto($data['marca_auto'] ?? null);
     $part->setModeloAuto($data['modelo_auto'] ?? null);
-    $part->setAñoAuto(isset($data['año_auto']) && $data['año_auto'] !== '' ? (int)$data['año_auto'] : null);
+    $part->setAnioAuto(isset($data['anio_auto']) && $data['anio_auto'] !== '' ? (int)$data['anio_auto'] : null);
     $part->setPrecio(isset($data['precio']) && $data['precio'] !== '' ? (float)$data['precio'] : 0.0);
     $part->setCantidadDisponible(isset($data['cantidad_disponible']) && $data['cantidad_disponible'] !== '' ? (int)$data['cantidad_disponible'] : 0);
     $part->setSeccionId((int)($data['seccion_id'] ?? 0));
@@ -62,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $uploadsDir = 'uploads/parts';
         $thumbsDir = 'uploads/thumbs';
         
-        // Crear directorios si no existen
         if (!is_dir(ROOT_PATH . '/' . $uploadsDir)) mkdir(ROOT_PATH . '/' . $uploadsDir, 0777, true);
         if (!is_dir(ROOT_PATH . '/' . $thumbsDir)) mkdir(ROOT_PATH . '/' . $thumbsDir, 0777, true);
 
@@ -75,20 +74,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $part->setThumbnailUrl($thumbnailPath);
             } else {
                 $errors[] = "La imagen principal se subió, pero no se pudo crear el thumbnail.";
-                // Opcional: borrar la imagen principal si el thumbnail falla
                 unlink(ROOT_PATH . '/' . $imagePath);
             }
         } else {
             $errors[] = "Error al subir la imagen. Verifique el tipo (JPG, PNG, GIF) y el tamaño (máx 5MB).";
         }
     } elseif (!$isEditMode) {
-        // La imagen es requerida al crear una nueva parte
         $errors[] = "Debe seleccionar una imagen para la parte.";
     }
 
     // 6. Guardar si no hay errores
     if (empty($errors)) {
         if ($part->save()) {
+            FlashMessage::setMessage('Parte del inventario guardada con éxito.', 'success');
             header('Location: inventario.php');
             exit();
         } else {

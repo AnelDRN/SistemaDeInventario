@@ -3,6 +3,7 @@ require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 use App\Models\User;
 use App\Helpers\Sanitizer;
+use App\Helpers\FlashMessage;
 
 // --- Controlador del Formulario de Usuario (Crear/Editar) ---
 
@@ -58,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($user->save()) {
+            FlashMessage::setMessage('Usuario guardado con éxito.', 'success');
             header('Location: usuarios.php');
             exit();
         } else {

@@ -79,8 +79,8 @@
                     <input type="text" class="form-control" id="modelo_auto" name="modelo_auto" value="<?php echo htmlspecialchars($part->getModeloAuto() ?? ''); ?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="año_auto" class="form-label">Año</label>
-                    <input type="number" class="form-control" id="año_auto" name="año_auto" value="<?php echo htmlspecialchars($part->getAñoAuto() ?? ''); ?>" placeholder="Ej: 2015">
+                    <label for="anio_auto" class="form-label">Año</label>
+                    <input type="number" class="form-control" id="anio_auto" name="anio_auto" value="<?php echo htmlspecialchars($part->getAnioAuto() ?? ''); ?>" placeholder="Ej: 2015">
                 </div>
             </div>
 

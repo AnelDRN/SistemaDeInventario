@@ -46,7 +46,7 @@
                                 <td><?php echo htmlspecialchars($part->getNombre()); ?></td>
                                 <td><?php echo htmlspecialchars($part->getTipoParte() ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($part->getMarcaAuto() . ' ' . $part->getModeloAuto()); ?></td>
-                                <td><?php echo htmlspecialchars($part->getAñoAuto() ?? 'N/A'); ?></td>
+                                <td><?php echo htmlspecialchars($part->getAnioAuto() ?? 'N/A'); ?></td>
                                 <td>$<?php echo number_format($part->getPrecio(), 2); ?></td>
                                 <td><?php echo htmlspecialchars($part->getCantidadDisponible()); ?></td>
                                 <td><?php echo htmlspecialchars($sectionMap[$part->getSeccionId()] ?? 'N/A'); ?></td>
