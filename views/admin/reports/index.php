@@ -1,8 +1,5 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
-    <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/reports/exportPartInventoryExcel" class="btn btn-success">
-        <i class="bi bi-file-earmark-excel"></i> Exportar Inventario a Excel
-    </a>
 </div>
 
 <div class="card mb-4">
