@@ -206,21 +206,26 @@ class Part
     {
         $pdo = Database::getInstance()->getConnection();
         $query = "SELECT * FROM partes 
-                  WHERE (nombre LIKE :term 
-                     OR tipo_parte LIKE :term 
-                     OR marca_auto LIKE :term 
-                     OR modelo_auto LIKE :term)";
+                  WHERE (nombre LIKE ? 
+                     OR tipo_parte LIKE ? 
+                     OR marca_auto LIKE ? 
+                     OR modelo_auto LIKE ?)";
         
-        $params = [':term' => '%' . $searchTerm . '%'];
+        $params = [
+            '%' . $searchTerm . '%',
+            '%' . $searchTerm . '%',
+            '%' . $searchTerm . '%',
+            '%' . $searchTerm . '%'
+        ];
 
         if ($sectionId !== null) {
-            $query .= " AND seccion_id = :seccion_id";
-            $params[':seccion_id'] = $sectionId; // FIX: Add the parameter to the array
+            $query .= " AND seccion_id = ?";
+            $params[] = $sectionId; // Append to the end of the indexed array
         }
         $query .= " ORDER BY fecha_creacion DESC";
         
         // --- Debugging Start ---
-        error_log("DEBUG: Part::searchBySection - Statement prepared and about to execute. Query: " . $query . " Params: " . print_r($params, true));
+        error_log("DEBUG: Part::searchBySection - Statement prepared and about to execute. Query (positional): " . $query . " Params: " . print_r($params, true));
         // --- Debugging End ---
 
         $stmt = $pdo->prepare(trim($query)); // Add trim() here

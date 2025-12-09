@@ -7,16 +7,17 @@ Línea: 227
 
 Stack Trace:
 #0 C:\wamp64\www\SDI\SistemaDeInventario\src\Models\Part.php(227): PDOStatement->execute(Array)
-#1 C:\wamp64\www\SDI\SistemaDeInventario\src\Controllers\PartController.php(27): App\Models\Part::searchBySection('Faro Delantero ...', NULL)
+#1 C:\wamp64\www\SDI\SistemaDeInventario\src\Controllers\PartController.php(27): App\Models\Part::searchBySection('Faro', NULL)
 #2 C:\wamp64\www\SDI\SistemaDeInventario\src\Core\Router.php(76): App\Controllers\PartController->index()
 #3 C:\wamp64\www\SDI\SistemaDeInventario\public\index.php(129): App\Core\Router->dispatch('admin/inventari...')
 #4 {main}
 
-[09-Dec-2025 11:36:12 UTC] DEBUG: Part::searchBySection - Statement prepared and about to execute. Query: SELECT * FROM partes 
+
+[09-Dec-2025 11:39:19 UTC] DEBUG: Part::searchBySection - Statement prepared and about to execute. Query: SELECT * FROM partes 
                   WHERE (nombre LIKE :term 
                      OR tipo_parte LIKE :term 
                      OR marca_auto LIKE :term 
                      OR modelo_auto LIKE :term) ORDER BY fecha_creacion DESC Params: Array
 (
-    [:term] => %Faro Delantero Izquierdo%
+    [:term] => %Faro%
 )
