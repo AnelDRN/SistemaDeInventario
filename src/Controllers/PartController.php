@@ -21,11 +21,12 @@ class PartController extends BaseController
 
         $pageTitle = 'Gestión de Inventario';
         $searchTerm = Sanitizer::sanitizeString($_GET['search'] ?? '');
+        $sectionId = isset($_GET['section_id']) ? (int)$_GET['section_id'] : null; // Retrieve section_id
 
         if (!empty($searchTerm)) {
-            $parts = Part::search($searchTerm);
+            $parts = Part::searchBySection($searchTerm, $sectionId); // Use new searchBySection
         } else {
-            $parts = Part::findAll();
+            $parts = Part::findAllBySection($sectionId); // Use new findAllBySection
         }
 
         $sections = Section::findAll();
@@ -38,6 +39,8 @@ class PartController extends BaseController
             'pageTitle' => $pageTitle,
             'searchTerm' => $searchTerm,
             'parts' => $parts,
+            'sections' => $sections, // Pass sections to the view for filter display
+            'selectedSectionId' => $sectionId, // Pass selected section to retain filter state
             'sectionMap' => $sectionMap
         ]);
     }
@@ -177,6 +180,62 @@ class PartController extends BaseController
             }
         }
         $this->redirect('public/index.php?/admin/inventario');
+    }
+
+    /**
+     * Exports the current inventory (potentially filtered) to a CSV file.
+     */
+    public function exportCsv(): void
+    {
+        $this->authorizeAdmin();
+
+        // Retrieve filters from GET parameters
+        $searchTerm = Sanitizer::sanitizeString($_GET['search'] ?? '');
+        $sectionId = isset($_GET['section_id']) ? (int)$_GET['section_id'] : null;
+
+        // Fetch filtered parts, similar to the index method
+        if (!empty($searchTerm)) {
+            $parts = Part::searchBySection($searchTerm, $sectionId);
+        } else {
+            $parts = Part::findAllBySection($sectionId);
+        }
+
+        // Fetch sections to map IDs to names for the CSV
+        $sections = Section::findAll();
+        $sectionMap = [];
+        foreach ($sections as $section) {
+            $sectionMap[$section->getId()] = $section->getNombre();
+        }
+
+        // Set headers for CSV download
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="inventario_partes_' . date('Ymd_His') . '.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $output = fopen('php://output', 'w');
+
+        // Output CSV header row
+        fputcsv($output, ['ID', 'Nombre', 'Descripcion', 'Tipo Parte', 'Marca Auto', 'Modelo Auto', 'Año Auto', 'Precio', 'Cantidad Disponible', 'Seccion']);
+
+        // Output data rows
+        foreach ($parts as $part) {
+            fputcsv($output, [
+                $part->getId(),
+                $part->getNombre(),
+                $part->getDescripcion(),
+                $part->getTipoParte(),
+                $part->getMarcaAuto(),
+                $part->getModeloAuto(),
+                $part->getAnioAuto(),
+                $part->getPrecio(),
+                $part->getCantidadDisponible(),
+                $sectionMap[$part->getSeccionId()] ?? 'N/A' // Map section ID to name
+            ]);
+        }
+
+        fclose($output);
+        exit(); // Stop script execution after CSV generation
     }
     
     // --- Métodos privados de ayuda ---

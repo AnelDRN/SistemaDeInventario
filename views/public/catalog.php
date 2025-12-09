@@ -5,13 +5,32 @@
     </div>
 </div>
 
-<div class="mb-4">
-    <form action="<?php echo BASE_URL; ?>/public/index.php" method="GET" class="d-flex">
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <!-- Search Form -->
+    <form action="<?php echo BASE_URL; ?>/public/index.php" method="GET" class="d-flex me-3 flex-grow-1">
         <input type="text" name="search" class="form-control me-2" placeholder="Buscar por nombre, tipo, marca..." value="<?php echo htmlspecialchars($searchTerm ?? ''); ?>">
+        <?php if (!empty($selectedPartType)): ?>
+            <input type="hidden" name="part_type" value="<?php echo htmlspecialchars($selectedPartType); ?>">
+        <?php endif; ?>
         <button type="submit" class="btn btn-info">Buscar</button>
-        <?php if(!empty($searchTerm)): ?>
+        <?php if(!empty($searchTerm) || !empty($selectedPartType)): ?>
              <a href="<?php echo BASE_URL; ?>/public/index.php" class="btn btn-outline-secondary ms-2">Limpiar</a>
         <?php endif; ?>
+    </form>
+
+    <!-- Part Type Filter -->
+    <form action="<?php echo BASE_URL; ?>/public/index.php" method="GET" class="d-flex">
+        <?php if(!empty($searchTerm)): ?>
+            <input type="hidden" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>">
+        <?php endif; ?>
+        <select name="part_type" class="form-select me-2" onchange="this.form.submit()">
+            <option value="">Todos los Tipos</option>
+            <?php foreach ($partTypes as $type): ?>
+                <option value="<?php echo htmlspecialchars($type); ?>" <?php echo ($selectedPartType == $type) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($type); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
     </form>
 </div>
 

@@ -1,19 +1,12 @@
-[09-Dec-2025 00:39:47 UTC] PartController::save - Image upload failed for new part. $_FILES['imagen'] content: Array
-(
-    [name] => P6070004.JPG
-    [full_path] => P6070004.JPG
-    [type] => 
-    [tmp_name] => 
-    [error] => 1
-    [size] => 0
-)
+ERROR
+Mensaje: Too few arguments to function App\Core\BaseController::__construct(), 0 passed in C:\wamp64\www\SDI\SistemaDeInventario\src\Controllers\CartController.php on line 16 and exactly 1 expected
 
-[09-Dec-2025 00:46:52 UTC] PartController::save - Image upload failed for new part. $_FILES['imagen'] content: Array
-(
-    [name] => P6070004.JPG
-    [full_path] => P6070004.JPG
-    [type] => 
-    [tmp_name] => 
-    [error] => 1
-    [size] => 0
-)
+Archivo: C:\wamp64\www\SDI\SistemaDeInventario\src\Core\BaseController.php
+
+Línea: 10
+
+Stack Trace:
+#0 C:\wamp64\www\SDI\SistemaDeInventario\src\Controllers\CartController.php(16): App\Core\BaseController->__construct()
+#1 C:\wamp64\www\SDI\SistemaDeInventario\src\Core\Router.php(70): App\Controllers\CartController->__construct(Array)
+#2 C:\wamp64\www\SDI\SistemaDeInventario\public\index.php(117): App\Core\Router->dispatch('cart')
+#3 {main}

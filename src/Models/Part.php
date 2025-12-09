@@ -110,10 +110,18 @@ class Part
         return $part;
     }
 
-    public static function findAll(): array
+    public static function findAll(?string $partType = null): array
     {
         $pdo = Database::getInstance()->getConnection();
-        $stmt = $pdo->query("SELECT * FROM partes ORDER BY fecha_creacion DESC");
+        $sql = "SELECT * FROM partes";
+        $params = [];
+        if ($partType !== null && $partType !== '') {
+            $sql .= " WHERE tipo_parte = :tipo_parte";
+            $params[':tipo_parte'] = $partType;
+        }
+        $sql .= " ORDER BY fecha_creacion DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
         $parts = [];
         while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $part = new self();
@@ -123,18 +131,29 @@ class Part
         return $parts;
     }
 
-    public static function search(string $searchTerm): array
+    public static function search(string $searchTerm, ?string $partType = null): array
     {
         $pdo = Database::getInstance()->getConnection();
         $query = "SELECT * FROM partes 
-                  WHERE nombre LIKE :term 
-                     OR tipo_parte LIKE :term 
-                     OR marca_auto LIKE :term 
-                     OR modelo_auto LIKE :term
-                  ORDER BY fecha_creacion DESC";
+                  WHERE (nombre LIKE :term_nombre 
+                     OR tipo_parte LIKE :term_tipo 
+                     OR marca_auto LIKE :term_marca 
+                     OR modelo_auto LIKE :term_modelo)";
+        $params = [
+            ':term_nombre' => '%' . $searchTerm . '%',
+            ':term_tipo' => '%' . $searchTerm . '%',
+            ':term_marca' => '%' . $searchTerm . '%',
+            ':term_modelo' => '%' . $searchTerm . '%'
+        ];
+
+        if ($partType !== null && $partType !== '') {
+            $query .= " AND tipo_parte = :tipo_parte";
+            $params[':tipo_parte'] = $partType;
+        }
+        $query .= " ORDER BY fecha_creacion DESC";
         
         $stmt = $pdo->prepare($query);
-        $stmt->execute([':term' => '%' . $searchTerm . '%']);
+        $stmt->execute($params);
         
         $parts = [];
         while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -142,6 +161,83 @@ class Part
             $part->fromArray($data);
             $parts[] = $part;
         }
+        return $parts;
+    }
+
+    /**
+     * Finds all unique part types available in the inventory.
+     * @return array<string> An array of unique part type strings.
+     */
+    public static function findUniquePartTypes(): array
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->query("SELECT DISTINCT tipo_parte FROM partes WHERE tipo_parte IS NOT NULL AND tipo_parte != '' ORDER BY tipo_parte ASC");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Finds all parts, optionally filtered by section ID.
+     */
+    public static function findAllBySection(?int $sectionId = null): array
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $sql = "SELECT * FROM partes";
+        $params = [];
+        if ($sectionId !== null) {
+            $sql .= " WHERE seccion_id = :seccion_id";
+            $params[':seccion_id'] = $sectionId;
+        }
+        $sql .= " ORDER BY fecha_creacion DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $parts = [];
+        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $part = new self();
+            $part->fromArray($data);
+            $parts[] = $part;
+        }
+        return $parts;
+    }
+
+    /**
+     * Searches parts by term, optionally filtered by section ID.
+     */
+    public static function searchBySection(string $searchTerm, ?int $sectionId = null): array
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $query = "SELECT * FROM partes 
+                  WHERE (nombre LIKE :term 
+                     OR tipo_parte LIKE :term 
+                     OR marca_auto LIKE :term 
+                     OR modelo_auto LIKE :term)";
+        
+        $params = [':term' => '%' . $searchTerm . '%'];
+
+        if ($sectionId !== null) {
+            $query .= " AND seccion_id = :seccion_id";
+            $params[':seccion_id'] = $sectionId;
+        }
+        $query .= " ORDER BY fecha_creacion DESC";
+        
+        // --- Debugging Start ---
+        error_log("DEBUG: Part::searchBySection - SQL Query: " . $query);
+        error_log("DEBUG: Part::searchBySection - Parameters: " . print_r($params, true));
+        // --- Debugging End ---
+
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        
+        $parts = [];
+        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $part = new self();
+            $part->fromArray($data);
+            $parts[] = $part;
+        }
+
+        // --- Debugging Start ---
+        error_log("DEBUG: Part::searchBySection - Found " . count($parts) . " parts.");
+        // --- Debugging End ---
+
         return $parts;
     }
 

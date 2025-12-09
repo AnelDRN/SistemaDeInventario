@@ -15,7 +15,11 @@ class RoleController extends BaseController
      */
     public function index(): void
     {
-        $this->authorizeAdmin();
+        if (!$this->hasPermission('can_manage_roles')) {
+            FlashMessage::setMessage('No tienes permiso para gestionar roles.', 'danger');
+            $this->redirect('public/index.php?/admin/dashboard');
+            return;
+        }
 
         $pageTitle = 'Gestión de Roles';
         $errors = [];
@@ -45,7 +49,11 @@ class RoleController extends BaseController
      */
     public function save(): void
     {
-        $this->authorizeAdmin();
+        if (!$this->hasPermission('can_manage_roles')) {
+            FlashMessage::setMessage('No tienes permiso para gestionar roles.', 'danger');
+            $this->redirect('public/index.php?/admin/dashboard');
+            return;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = isset($_POST['id']) && !empty($_POST['id']) ? (int)$_POST['id'] : null;
@@ -75,7 +83,11 @@ class RoleController extends BaseController
      */
     public function delete(): void
     {
-        $this->authorizeAdmin();
+        if (!$this->hasPermission('can_manage_roles')) {
+            FlashMessage::setMessage('No tienes permiso para gestionar roles.', 'danger');
+            $this->redirect('public/index.php?/admin/dashboard');
+            return;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : null;

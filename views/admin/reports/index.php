@@ -1,5 +1,8 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
+    <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/reports/exportPartInventoryExcel" class="btn btn-success">
+        <i class="bi bi-file-earmark-excel"></i> Exportar Inventario a Excel
+    </a>
 </div>
 
 <div class="card mb-4">
@@ -72,6 +75,64 @@
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Total por Categoría -->
+<?php if (!empty($revenueByCategory)): ?>
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-tags"></i> Total de Ingresos por Categoría
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Categoría</th>
+                        <th class="text-end">Ingresos Totales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($revenueByCategory as $item): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($item['category_name']); ?></td>
+                            <td class="text-end">$<?php echo number_format($item['total_revenue'], 2); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Partes más Vendidas -->
+<?php if (!empty($mostSoldParts)): ?>
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="bi bi-graph-up"></i> Partes Más Vendidas
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Parte</th>
+                        <th class="text-end">Cantidad Vendida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($mostSoldParts as $item): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($item['nombre_parte']); ?></td>
+                            <td class="text-end"><?php echo htmlspecialchars($item['quantity_sold']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <style>
     @media print {

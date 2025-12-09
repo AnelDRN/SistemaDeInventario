@@ -18,17 +18,22 @@ class HomeController extends BaseController
     {
         $pageTitle = 'Catálogo de Partes';
         $searchTerm = Sanitizer::sanitizeString($_GET['search'] ?? '');
+        $partType = Sanitizer::sanitizeString($_GET['part_type'] ?? ''); // Retrieve part_type
 
         if (!empty($searchTerm)) {
-            $parts = Part::search($searchTerm);
+            $parts = Part::search($searchTerm, $partType); // Pass partType
         } else {
-            $parts = Part::findAll();
+            $parts = Part::findAll($partType); // Pass partType
         }
+
+        $partTypes = \App\Models\Part::findUniquePartTypes(); // Fetch unique part types for filter display
 
         $this->view('public/catalog', [
             'pageTitle' => $pageTitle,
             'parts' => $parts,
-            'searchTerm' => $searchTerm // Pass searchTerm to the view
+            'searchTerm' => $searchTerm,
+            'partTypes' => $partTypes, // Pass part types to the view
+            'selectedPartType' => $partType // Pass selected part type to retain filter state
         ]);
     }
 

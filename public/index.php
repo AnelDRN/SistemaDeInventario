@@ -16,6 +16,14 @@ $router->add('', ['controller' => 'HomeController', 'action' => 'index']); // Ru
 $router->add('part/{id:\d+}', ['controller' => 'HomeController', 'action' => 'show']);
 $router->add('part/comment', ['controller' => 'HomeController', 'action' => 'addComment']);
 
+// --- RUTAS CARRITO ---
+$router->add('cart', ['controller' => 'CartController', 'action' => 'index']);
+$router->add('cart/add', ['controller' => 'CartController', 'action' => 'add']);
+$router->add('cart/update', ['controller' => 'CartController', 'action' => 'update']);
+$router->add('cart/remove', ['controller' => 'CartController', 'action' => 'remove']);
+$router->add('cart/checkout', ['controller' => 'CartController', 'action' => 'checkout']);
+$router->add('cart/success', ['controller' => 'CartController', 'action' => 'success']);
+
 // 3. Añadir las rutas de la aplicación
 // Sintaxis: $router->add('URL', ['controller' => 'NombreDelControlador', 'action' => 'nombreDeLaAccion']);
 
@@ -36,6 +44,7 @@ $router->add('admin/inventario/create', ['controller' => 'PartController', 'acti
 $router->add('admin/inventario/edit/{id:\d+}', ['controller' => 'PartController', 'action' => 'edit']);
 $router->add('admin/inventario/save', ['controller' => 'PartController', 'action' => 'save']);
 $router->add('admin/inventario/delete', ['controller' => 'PartController', 'action' => 'delete']);
+$router->add('admin/inventario/export-csv', ['controller' => 'PartController', 'action' => 'exportCsv']);
 
 // Rutas de Secciones
 $router->add('admin/secciones', ['controller' => 'SectionController', 'action' => 'index']);
@@ -58,6 +67,8 @@ $router->add('login/process', ['controller' => 'UserController', 'action' => 'lo
 $router->add('logout', ['controller' => 'UserController', 'action' => 'logout']);
 $router->add('register', ['controller' => 'UserController', 'action' => 'showRegistrationForm']);
 $router->add('register/process', ['controller' => 'UserController', 'action' => 'register']);
+$router->add('profile/change-password', ['controller' => 'UserController', 'action' => 'showChangePasswordForm']);
+$router->add('profile/change-password/process', ['controller' => 'UserController', 'action' => 'changePassword']);
 
 // Rutas de ejemplo para el módulo de usuarios (que migraremos)
 $router->add('admin/users', ['controller' => 'UserController', 'action' => 'index']);
@@ -71,21 +82,39 @@ $router->add('admin/users/activate/{id:\d+}', ['controller' => 'UserController',
 
 // 4. Despachar la ruta
 try {
-    // Usamos QUERY_STRING para URLs del tipo: /public/index.php?/admin/users
-    $url = $_SERVER['QUERY_STRING'] ?? '';
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+    $script_name = $_SERVER['SCRIPT_NAME'] ?? ''; // e.g., /SDI/SistemaDeInventario/public/index.php
 
-    // Extraer la parte de la ruta del QUERY_STRING.
-    // La QUERY_STRING puede ser "admin/inventario" o "admin/inventario&search=faro"
-    // o "admin/inventario?param=value".
-    // Queremos solo la parte que el router debe usar para el matching de rutas.
-    
-    // Primero, obtener la parte antes del primer '?' si existe
-    $route_path_with_query = strtok($url, '?'); 
+    $route = '';
+    // Extraer la ruta base relativa al SCRIPT_NAME
+    if (str_starts_with($request_uri, $script_name)) {
+        $route = substr($request_uri, strlen($script_name));
+    } else {
+        // Fallback si la URI no empieza con el nombre del script
+        $route = $request_uri;
+    }
 
-    // Luego, de esa parte, obtener lo que esté antes del primer '&' si existe
-    $route_path = strtok($route_path_with_query, '&');
+    // Normalizar la ruta para el router
+    $final_route = '';
+    if (str_starts_with($route, '?/')) {
+        // Es una ruta MVC de tipo "?/admin/inventario"
+        $final_route = substr($route, 2);
+    } elseif (str_starts_with($route, '/?/')) {
+        // Es una ruta MVC de tipo "/?/admin/inventario"
+        $final_route = substr($route, 3);
+    } elseif (str_starts_with($route, '?')) {
+        // Es una URL tipo "?search=Faro". La ruta real para el router es vacía (root).
+        $final_route = '';
+    } else {
+        // Es una ruta sin "?" o "?/", ej. "admin/dashboard" si se usa PathInfo
+        // o si la URI no tenía query string.
+        $final_route = $route;
+    }
+
+    // Quitar barras iniciales/finales para normalizar la ruta
+    $final_route = trim($final_route, '/');
     
-    $router->dispatch($route_path);
+    $router->dispatch($final_route);
 } catch (\Throwable $e) { // Cambiado a Throwable para capturar todo tipo de errores
     // Manejo de errores con más detalle para depuración
     http_response_code($e->getCode() === 404 ? 404 : 500);

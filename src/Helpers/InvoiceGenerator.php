@@ -7,6 +7,8 @@ require_once(ROOT_PATH . '/libs/fpdf/fpdf.php');
 
 class InvoiceGenerator extends \FPDF
 {
+    private const ITBMS_RATE = 0.07; // 7%
+
     // Page header
     function Header()
     {
@@ -49,15 +51,34 @@ class InvoiceGenerator extends \FPDF
 
         $this->Ln(10); // Line break
 
+        // Calculate amounts (assuming precio_venta is the net price)
+        $netPrice = $saleData['precio_venta'];
+        $itbmsAmount = $netPrice * self::ITBMS_RATE;
+        $totalPrice = $netPrice + $itbmsAmount;
+
         // Table Header
         $this->SetFont('Times','B',12);
         $this->Cell(130,10,'Parte Vendida',1,0,'C');
-        $this->Cell(60,10,'Precio Final',1,1,'C');
+        $this->Cell(60,10,'Precio Neto',1,1,'C');
 
-        // Table Body
+        // Table Body - Item details
         $this->SetFont('Times','',12);
         $this->Cell(130,10,htmlspecialchars($saleData['nombre_parte']),1,0);
-        $this->Cell(60,10,'$' . number_format($saleData['precio_venta'], 2),1,1,'R');
+        $this->Cell(60,10,'$' . number_format($netPrice, 2),1,1,'R'); // This is Net Price
+
+        $this->Ln(5); // Small line break
+
+        // Summary
+        $this->Cell(130,10,'Subtotal:',0,0,'R');
+        $this->Cell(60,10,'$' . number_format($netPrice, 2),0,1,'R');
+
+        $this->Cell(130,10,'ITBMS ('. (self::ITBMS_RATE * 100) .'%),:',0,0,'R');
+        $this->Cell(60,10,'$' . number_format($itbmsAmount, 2),0,1,'R');
+
+        $this->SetFont('Times','B',12);
+        $this->Cell(130,10,'TOTAL:',0,0,'R');
+        $this->Cell(60,10,'$' . number_format($totalPrice, 2),0,1,'R');
+
 
         // Output PDF
         $this->Output('D', 'Factura_' . $saleData['sale_id'] . '.pdf');

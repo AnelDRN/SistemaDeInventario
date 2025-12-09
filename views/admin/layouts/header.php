@@ -20,9 +20,11 @@
         </button>
         <div class="collapse navbar-collapse" id="adminNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] === 1): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/users">Usuarios</a>
                 </li>
+                <?php endif; ?>
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/roles">Roles</a>
                 </li>
@@ -47,6 +49,8 @@
                         <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION['username'] ?? 'Usuario'); ?>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/public/index.php?/profile/change-password">Cambiar Contraseña</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/public/index.php?/logout">Cerrar Sesión</a></li>
                     </ul>
                 </li>

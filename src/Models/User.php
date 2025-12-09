@@ -13,7 +13,7 @@ class User
     private string $nombre_usuario;
     private string $email;
     private string $password_hash;
-    private int $rol_id;
+    private Role $role; // Added Role object
     private bool $activo;
     private ?string $fecha_creacion;
     private ?string $fecha_actualizacion;
@@ -25,7 +25,7 @@ class User
         string $nombre_usuario = '',
         string $email = '',
         string $password_hash = '',
-        int $rol_id = 0,
+        Role $role = new Role(), // Default to a new Role object
         bool $activo = true,
         ?string $fecha_creacion = null,
         ?string $fecha_actualizacion = null
@@ -34,7 +34,7 @@ class User
         $this->nombre_usuario = $nombre_usuario;
         $this->email = $email;
         $this->password_hash = $password_hash;
-        $this->rol_id = $rol_id;
+        $this->role = $role;
         $this->activo = $activo;
         $this->fecha_creacion = $fecha_creacion;
         $this->fecha_actualizacion = $fecha_actualizacion;
@@ -47,16 +47,25 @@ class User
     public function getNombreUsuario(): string { return $this->nombre_usuario; }
     public function getEmail(): string { return $this->email; }
     public function getPasswordHash(): string { return $this->password_hash; }
-    public function getRolId(): int { return $this->rol_id; }
+    public function getRol(): Role { return $this->role; } // Getter for Role object
+    public function getRolId(): int { return $this->role->getId() ?? 0; } // Getter for role ID
     public function isActivo(): bool { return $this->activo; }
     public function getFechaCreacion(): ?string { return $this->fecha_creacion; }
     public function getFechaActualizacion(): ?string { return $this->fecha_actualizacion; }
+
+    // Permission Checkers
+    public function canManageUsers(): bool { return $this->role->canManageUsers(); }
+    public function canManageRoles(): bool { return $this->role->canManageRoles(); }
+    public function canManageSections(): bool { return $this->role->canManageSections(); }
+    public function canManageInventory(): bool { return $this->role->canManageInventory(); }
+    public function canViewReports(): bool { return $this->role->canViewReports(); }
 
     // Setters (simplified for now, full validation would be in controller/service)
     public function setNombreUsuario(string $nombre_usuario): void { $this->nombre_usuario = Sanitizer::sanitizeString($nombre_usuario); }
     public function setEmail(string $email): void { $this->email = Sanitizer::sanitizeString($email); }
     public function setPasswordHash(string $password_hash): void { $this->password_hash = $password_hash; } // Hashing done outside model
-    public function setRolId(int $rol_id): void { $this->rol_id = $rol_id; }
+    public function setRol(Role $role): void { $this->role = $role; } // Setter for Role object
+    public function setRolId(int $rol_id): void { $this->role = Role::findById($rol_id) ?? new Role(); } // Setter for role ID, fetches Role object
     public function setActivo(bool $activo): void { $this->activo = $activo; }
 
     /**
@@ -74,13 +83,15 @@ class User
         if (!$data) {
             return null;
         }
+        $role = Role::findById($data['rol_id']); // Fetch Role object
+        if (!$role) return null; // Should not happen if DB is consistent
 
         return new self(
             $data['id'],
             $data['nombre_usuario'],
             $data['email'],
             $data['password_hash'],
-            $data['rol_id'],
+            $role, // Pass Role object
             (bool)$data['activo'],
             $data['fecha_creacion'],
             $data['fecha_actualizacion']
@@ -102,13 +113,15 @@ class User
         if (!$data) {
             return null;
         }
+        $role = Role::findById($data['rol_id']); // Fetch Role object
+        if (!$role) return null;
 
         return new self(
             $data['id'],
             $data['nombre_usuario'],
             $data['email'],
             $data['password_hash'],
-            $data['rol_id'],
+            $role, // Pass Role object
             (bool)$data['activo'],
             $data['fecha_creacion'],
             $data['fecha_actualizacion']
@@ -130,13 +143,15 @@ class User
         if (!$data) {
             return null;
         }
+        $role = Role::findById($data['rol_id']); // Fetch Role object
+        if (!$role) return null;
 
         return new self(
             $data['id'],
             $data['nombre_usuario'],
             $data['email'],
             $data['password_hash'],
-            $data['rol_id'],
+            $role, // Pass Role object
             (bool)$data['activo'],
             $data['fecha_creacion'],
             $data['fecha_actualizacion']
@@ -166,7 +181,7 @@ class User
             'nombre_usuario' => $this->nombre_usuario,
             'email' => $this->email,
             'password_hash' => $this->password_hash,
-            'rol_id' => $this->rol_id,
+            'rol_id' => $this->role->getId(), // Use Role object to get ID
             'activo' => $this->activo
         ]);
 
@@ -192,7 +207,7 @@ class User
             'nombre_usuario' => $this->nombre_usuario,
             'email' => $this->email,
             'password_hash' => $this->password_hash,
-            'rol_id' => $this->rol_id,
+            'rol_id' => $this->role->getId(), // Use Role object to get ID
             'activo' => $this->activo,
             'id' => $this->id
         ]);
@@ -231,12 +246,15 @@ class User
         $stmt->execute($params);
         $users = [];
         while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $role = Role::findById($data['rol_id']); // Fetch Role object
+            if (!$role) continue; // Skip if role not found (shouldn't happen)
+
             $users[] = new self(
                 $data['id'],
                 $data['nombre_usuario'],
                 $data['email'],
                 $data['password_hash'],
-                $data['rol_id'],
+                $role, // Pass Role object
                 (bool)$data['activo'],
                 $data['fecha_creacion'],
                 $data['fecha_actualizacion']

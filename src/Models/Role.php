@@ -10,13 +10,30 @@ class Role
 {
     private ?int $id;
     private string $nombre;
+    private bool $can_manage_users;
+    private bool $can_manage_roles;
+    private bool $can_manage_sections;
+    private bool $can_manage_inventory;
+    private bool $can_view_reports;
 
     private PDO $pdo;
 
-    public function __construct(?int $id = null, string $nombre = '')
-    {
+    public function __construct(
+        ?int $id = null, 
+        string $nombre = '',
+        bool $can_manage_users = false,
+        bool $can_manage_roles = false,
+        bool $can_manage_sections = false,
+        bool $can_manage_inventory = false,
+        bool $can_view_reports = false
+    ) {
         $this->id = $id;
         $this->nombre = $nombre;
+        $this->can_manage_users = $can_manage_users;
+        $this->can_manage_roles = $can_manage_roles;
+        $this->can_manage_sections = $can_manage_sections;
+        $this->can_manage_inventory = $can_manage_inventory;
+        $this->can_view_reports = $can_view_reports;
         $this->pdo = Database::getInstance()->getConnection();
     }
 
@@ -31,7 +48,32 @@ class Role
         return $this->nombre;
     }
 
-    // Setters
+    public function canManageUsers(): bool
+    {
+        return $this->can_manage_users;
+    }
+
+    public function canManageRoles(): bool
+    {
+        return $this->can_manage_roles;
+    }
+
+    public function canManageSections(): bool
+    {
+        return $this->can_manage_sections;
+    }
+
+    public function canManageInventory(): bool
+    {
+        return $this->can_manage_inventory;
+    }
+
+    public function canViewReports(): bool
+    {
+        return $this->can_view_reports;
+    }
+
+    // Setters (only for nombre for now, permissions are set via constructor/DB)
     public function setNombre(string $nombre): void
     {
         $this->nombre = $nombre;
@@ -50,7 +92,15 @@ class Role
         if (!$data) {
             return null;
         }
-        return new self($data['id'], $data['nombre']);
+        return new self(
+            $data['id'], 
+            $data['nombre'],
+            (bool)$data['can_manage_users'],
+            (bool)$data['can_manage_roles'],
+            (bool)$data['can_manage_sections'],
+            (bool)$data['can_manage_inventory'],
+            (bool)$data['can_view_reports']
+        );
     }
 
     /**
@@ -62,24 +112,55 @@ class Role
         $stmt = $pdo->query("SELECT * FROM roles ORDER BY id ASC");
         $roles = [];
         while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $roles[] = new self($data['id'], $data['nombre']);
+            $roles[] = new self(
+                $data['id'], 
+                $data['nombre'],
+                (bool)$data['can_manage_users'],
+                (bool)$data['can_manage_roles'],
+                (bool)$data['can_manage_sections'],
+                (bool)$data['can_manage_inventory'],
+                (bool)$data['can_view_reports']
+            );
         }
         return $roles;
     }
 
     /**
      * Saves the role data to the database (inserts or updates).
+     * This method will need to be updated to handle permissions if roles become editable.
      */
     public function save(): bool
     {
         if ($this->id) {
             // Update
-            $stmt = $this->pdo->prepare("UPDATE roles SET nombre = :nombre WHERE id = :id");
-            return $stmt->execute(['nombre' => $this->nombre, 'id' => $this->id]);
+            $stmt = $this->pdo->prepare("UPDATE roles SET 
+                nombre = :nombre, 
+                can_manage_users = :can_manage_users,
+                can_manage_roles = :can_manage_roles,
+                can_manage_sections = :can_manage_sections,
+                can_manage_inventory = :can_manage_inventory,
+                can_view_reports = :can_view_reports
+                WHERE id = :id");
+            return $stmt->execute([
+                'nombre' => $this->nombre, 
+                'can_manage_users' => $this->can_manage_users,
+                'can_manage_roles' => $this->can_manage_roles,
+                'can_manage_sections' => $this->can_manage_sections,
+                'can_manage_inventory' => $this->can_manage_inventory,
+                'can_view_reports' => $this->can_view_reports,
+                'id' => $this->id
+            ]);
         } else {
             // Insert
-            $stmt = $this->pdo->prepare("INSERT INTO roles (nombre) VALUES (:nombre)");
-            $result = $stmt->execute(['nombre' => $this->nombre]);
+            $stmt = $this->pdo->prepare("INSERT INTO roles (nombre, can_manage_users, can_manage_roles, can_manage_sections, can_manage_inventory, can_view_reports) VALUES (:nombre, :can_manage_users, :can_manage_roles, :can_manage_sections, :can_manage_inventory, :can_view_reports)");
+            $result = $stmt->execute([
+                'nombre' => $this->nombre,
+                'can_manage_users' => $this->can_manage_users,
+                'can_manage_roles' => $this->can_manage_roles,
+                'can_manage_sections' => $this->can_manage_sections,
+                'can_manage_inventory' => $this->can_manage_inventory,
+                'can_view_reports' => $this->can_view_reports
+            ]);
             if ($result) {
                 $this->id = (int)$this->pdo->lastInsertId();
             }

@@ -30,7 +30,7 @@ El siguiente diagrama ilustra las interacciones de los actores con las funcional
 graph TD
     subgraph "Actores"
         Admin((Administrador))
-        Cliente((Cliente Registrado))
+        Cliente((Cliente Registrado)
         Visitante((Visitante))
     end
 

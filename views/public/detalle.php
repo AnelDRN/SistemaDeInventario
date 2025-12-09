@@ -17,6 +17,32 @@
                 <strong class="text-success h4">Precio: $<?php echo number_format($part->getPrecio(), 2); ?></strong>
             </li>
         </ul>
+
+        <?php if ($part->getCantidadDisponible() > 0): ?>
+            <div class="card mt-4">
+                <div class="card-body">
+                    <form action="<?php echo BASE_URL; ?>/public/index.php?/cart/add" method="POST">
+                        <input type="hidden" name="part_id" value="<?php echo $part->getId(); ?>">
+                        <div class="row align-items-center">
+                            <div class="col-md-5">
+                                <label for="quantity" class="form-label">Cantidad:</label>
+                                <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="<?php echo $part->getCantidadDisponible(); ?>">
+                            </div>
+                            <div class="col-md-7 d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg mt-3 mt-md-0">
+                                    <i class="bi bi-cart-plus"></i> Agregar al Carrito
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-warning mt-4" role="alert">
+                Este producto no está disponible actualmente.
+            </div>
+        <?php endif; ?>
+
     </div>
 </div>
 

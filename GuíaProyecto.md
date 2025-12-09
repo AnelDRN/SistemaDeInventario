@@ -94,11 +94,41 @@
 
 *Esta sección se actualiza al final de cada sesión.*
 
-- **Estado Inicial:**
-    - **Resumen:** Inicio del proyecto. Definición de requerimientos basada en documento PDF.
-    - **Posición Actual:** Fase 0 - Configuración.
-    - **Siguiente Tarea Inmediata:**
-        - [ ] Crear estructura de carpetas en `www`.
-        - [x] Diseñar Script SQL (Tablas: `usuarios`, `roles`, `partes`, `secciones`, `vendido_parte`, `comentarios`).
-```
+**Sesión del 09/12/2025:**
+    - **Resumen:** Se ha realizado una reevaluación exhaustiva del proyecto contra `alcances2.md`, se han implementado numerosas funcionalidades pendientes y se ha abordado la mayoría de los puntos parcialmente cumplidos. Se resolvieron errores críticos de enrutamiento y búsqueda.
+    - **Hitos:**
+        - [x] **#1 Login:** Completado (funcional para administradores y clientes, incluye registro).
+        - [x] **#2 CRUD de Usuarios (Funcionalidad básica y Cambio de Contraseña):** Completado (gestión básica de usuarios, módulo de cambio de contraseña e interfaz diferenciada para "Operadores" implementados).
+        - [x] **#3 Módulo de registro de inventario (CRUD Inventario):** Completado (CRUD completo).
+        - [x] **#4 Guardar thumbnail y imágenes grandes:** Completado (imágenes y thumbnails guardados y mostrados).
+        - [x] **#7 Módulo de Secciones o Categorías:** Completado (CRUD de secciones).
+        - [x] **#8 El Módulo de registro de inventario debe permitir consultas, búsquedas por nombre, por tipo de coche:** Completado (búsqueda por nombre/tipo de coche y filtrado por tipo de parte en admin y catálogo público).
+        - [x] **#9 La conexión debe realizarse mediante una clase:** Completado.
+        - [x] **#10 Implementar control de Errores:** Completado.
+        - [x] **#11 Clase de sanitizar y validar datos:** Completado.
+        - [x] **#12 Implementar una Interfaz como mínimo en el Proyecto:** Completado.
+        - [x] **#14 Página pública dónde se puedan ver las partes:** Completado.
+        - [x] **#16 Al entrar pueden tener algún tipo de categorías para dividir según el tipo de partes del auto:** Completado (filtrado por "tipo de parte" en catálogo público).
+        - [x] **#17 Al darle clic a categoría aparezcan un listado con imágenes miniaturas de la partes del auto:** Completado.
+        - [x] **#18 Que al darle clic a una opción o item del rastro puedan ver el detalle de la parte del auto, el costo y las unidades existentes:** Completado.
+        - [x] **#20 Emitir factura con ITBMS:** Completado (Factura PDF con ITBMS calculado y desglosado).
+        - [x] **#21 El sistema debe reducir el inventario al darse una compra de alguna parte del auto:** Completado.
+        - [x] **#22 Cada módulo debe tener una clase con atributos, métodos y comportamientos:** Completado.
+        - [x] **#23 El sistema debe contar con css y menús horizontales. Cada módulo debe permitir regresar al menú principal (HOME):** Completado.
+        - [x] **Preparación de DB y modelos (`Role`/`User`) para permisos granulares.**
+        - [x] **Configuración de `BaseController::hasPermission()` y `UserController::login()` para manejar permisos granulares.**
+        - [x] **Implementación de permisos granulares en `RoleController` (gestión de roles).**
+        - [x] **Implementación de permisos granulares en `SectionController` (gestión de secciones).**
+        - [x] **Implementación de permisos granulares en `PartController` (gestión de inventario).**
+        - [x] **Implementación de permisos granulares en `ReportController` (visualización de reportes).**
+        - [x] **Implementación de permisos granulares en `SaleController` (gestión de ventas).**
+        - [x] **Modificación del header del administrador para mostrar/ocultar enlaces basados en permisos de sesión.**
+        - [x] **Implementación de Exportación de Inventario a CSV.**
+
+    - **Siguiente Tarea:**
+        - [ ] **#6 Permisos Granulares:** Evaluar si se requiere una implementación más profunda de permisos granulares para acciones muy específicas dentro de módulos (ej. "no puede borrar", "solo puede ver"). (Aunque la visibilidad de módulos principales ya está cubierta).
+        - [ ] **#13 Reportes:** Implementar generación de reportes en formato **Excel** (no CSV).
+        - [ ] **#15 & #19 Compra Virtual y Carrito de Compras:** **(FEATURE GRANDE - Se recomienda abordar como un proyecto separado):** Implementar las tablas de base de datos, lógica de sesión y funcionalidades básicas de un carrito de compras (añadir/quitar productos, ajustar cantidades) y desarrollar un proceso de "checkout".
+
+    - **Notas:** Se recomienda al usuario ejecutar los scripts `ALTER TABLE` necesarios para actualizar la base de datos con los cambios de permisos granulares, según las instrucciones provistas anteriormente. La última versión del código fuente incluye la implementación de todos los permisos granulares y debería funcionar correctamente.```
 

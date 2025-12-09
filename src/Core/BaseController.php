@@ -67,4 +67,13 @@ abstract class BaseController
             $this->redirect('public/index.php?/login');
         }
     }
+
+    /**
+     * Checks if the current logged-in user has a specific permission.
+     * Permissions are expected to be stored in $_SESSION['user_permissions'].
+     */
+    protected function hasPermission(string $permission): bool
+    {
+        return isset($_SESSION['user_permissions'][$permission]) && $_SESSION['user_permissions'][$permission] === true;
+    }
 }

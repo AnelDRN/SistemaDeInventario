@@ -61,10 +61,33 @@ class UserController extends BaseController
                 // Login exitoso: guardar datos en la sesión
                 $_SESSION['user_id'] = $user->getId();
                 $_SESSION['username'] = $user->getNombreUsuario();
-                $_SESSION['role_id'] = $user->getRolId();
+                $_SESSION['role_id'] = $user->getRolId(); // Keep role_id for authorizeAdmin()
+                
+                // Store specific permissions from the Role object
+                $_SESSION['user_permissions'] = [
+                    'can_manage_users' => $user->getRol()->canManageUsers(),
+                    'can_manage_roles' => $user->getRol()->canManageRoles(),
+                    'can_manage_sections' => $user->getRol()->canManageSections(),
+                    'can_manage_inventory' => $user->getRol()->canManageInventory(),
+                    'can_view_reports' => $user->getRol()->canViewReports(),
+                ];
 
-                // Redirigir al nuevo dashboard MVC
-                $this->redirect('public/index.php?/admin/dashboard');
+                // --- Handle Redirect ---
+                if (isset($_SESSION['redirect_to'])) {
+                    $redirect_url = $_SESSION['redirect_to'];
+                    unset($_SESSION['redirect_to']);
+                    // Note: BaseController->redirect() does not handle full URLs well, needs relative path
+                    // We need to strip BASE_URL if it's present or construct the path carefully
+                    // Assuming redirect_to stores a path like '/cart/checkout'
+                    $this->redirect('public/index.php?' . $redirect_url);
+                } else {
+                    // Default redirect based on role
+                    if ($_SESSION['role_id'] === 1) { // Admin
+                        $this->redirect('public/index.php?/admin/dashboard');
+                    } else { // Other roles
+                        $this->redirect('public/index.php');
+                    }
+                }
                 return;
             } else {
                 // Fallo en el login
@@ -154,6 +177,84 @@ class UserController extends BaseController
         } else {
             $this->redirect('public/index.php?/register');
         }
+    }
+
+    /**
+     * Shows the form for a logged-in user to change their password.
+     */
+    public function showChangePasswordForm(): void
+    {
+        // Authorize any logged-in user
+        if (!isset($_SESSION['user_id'])) {
+            $this->redirect('public/index.php?/login');
+            return;
+        }
+
+        $this->view('user/change_password', [
+            'pageTitle' => 'Cambiar Contraseña',
+            'errors' => FlashMessage::getMessages('errors'),
+            'successMessage' => FlashMessage::getMessages('success') ? FlashMessage::getMessages('success')[0] : null
+        ]);
+    }
+
+    /**
+     * Processes the password change request for a logged-in user.
+     */
+    public function changePassword(): void
+    {
+        // Authorize any logged-in user
+        if (!isset($_SESSION['user_id'])) {
+            $this->redirect('public/index.php?/login');
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('public/index.php?/profile/change-password');
+            return;
+        }
+
+        $userId = (int)$_SESSION['user_id'];
+        $user = User::findById($userId);
+
+        if (!$user) {
+            FlashMessage::setMessage('Usuario no encontrado.', 'danger');
+            $this->redirect('public/index.php?/profile/change-password');
+            return;
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmNewPassword = $_POST['confirm_new_password'] ?? '';
+
+        $errors = [];
+
+        // Validate current password
+        if (!password_verify($currentPassword, $user->getPasswordHash())) {
+            $errors[] = "La contraseña actual es incorrecta.";
+        }
+
+        // Validate new password
+        if (empty($newPassword) || strlen($newPassword) < 6) {
+            $errors[] = "La nueva contraseña debe tener al menos 6 caracteres.";
+        }
+        if ($newPassword !== $confirmNewPassword) {
+            $errors[] = "La nueva contraseña y su confirmación no coinciden.";
+        }
+
+        if (empty($errors)) {
+            $user->setPasswordHash(password_hash($newPassword, PASSWORD_DEFAULT));
+            if ($user->save()) {
+                FlashMessage::setMessage('Contraseña actualizada con éxito.', 'success');
+                $this->redirect('public/index.php?/profile/change-password');
+                return;
+            } else {
+                $errors[] = "Hubo un error al actualizar la contraseña.";
+            }
+        }
+        
+        // If there are errors, show the form again with messages
+        FlashMessage::setMessages('errors', $errors);
+        $this->redirect('public/index.php?/profile/change-password');
     }
 
     /**

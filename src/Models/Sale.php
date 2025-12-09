@@ -107,4 +107,44 @@ class Sale
         $stmt->execute([':year' => $year, ':month' => $month]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Calculates total revenue grouped by part category (section) for a given month and year.
+     * @return array An associative array with category name and total revenue.
+     */
+    public static function getTotalRevenueByCategory(int $year, int $month): array
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $sql = "SELECT s.nombre AS category_name, SUM(vp.precio_venta) AS total_revenue
+                FROM vendido_parte vp
+                JOIN partes p ON vp.parte_original_id = p.id
+                JOIN secciones s ON p.seccion_id = s.id
+                WHERE YEAR(vp.fecha_venta) = :year AND MONTH(vp.fecha_venta) = :month
+                GROUP BY s.nombre
+                ORDER BY total_revenue DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':year' => $year, ':month' => $month]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retrieves the most sold parts for a given month and year.
+     * @return array An associative array with part name and quantity sold.
+     */
+    public static function getMostSoldParts(int $year, int $month, int $limit = 5): array
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $sql = "SELECT vp.nombre_parte, COUNT(vp.id) AS quantity_sold
+                FROM vendido_parte vp
+                WHERE YEAR(vp.fecha_venta) = :year AND MONTH(vp.fecha_venta) = :month
+                GROUP BY vp.nombre_parte
+                ORDER BY quantity_sold DESC
+                LIMIT :limit";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':year', $year, PDO::PARAM_INT);
+        $stmt->bindValue(':month', $month, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

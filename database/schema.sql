@@ -4,14 +4,19 @@
 CREATE TABLE IF NOT EXISTS `roles` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(50) NOT NULL UNIQUE,
+    `can_manage_users` BOOLEAN NOT NULL DEFAULT FALSE,
+    `can_manage_roles` BOOLEAN NOT NULL DEFAULT FALSE,
+    `can_manage_sections` BOOLEAN NOT NULL DEFAULT FALSE,
+    `can_manage_inventory` BOOLEAN NOT NULL DEFAULT FALSE,
+    `can_view_reports` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insertar roles básicos
-INSERT IGNORE INTO `roles` (`id`, `nombre`) VALUES
-(1, 'Administrador'),
-(2, 'Vendedor'),
-(3, 'Cliente');
+INSERT IGNORE INTO `roles` (`id`, `nombre`, `can_manage_users`, `can_manage_roles`, `can_manage_sections`, `can_manage_inventory`, `can_view_reports`) VALUES
+(1, 'Administrador', TRUE, TRUE, TRUE, TRUE, TRUE),
+(2, 'Vendedor', FALSE, FALSE, FALSE, TRUE, FALSE),
+(3, 'Cliente', FALSE, FALSE, FALSE, FALSE, FALSE);
 
 --
 -- Estructura de la tabla `usuarios`

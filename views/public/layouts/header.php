@@ -17,6 +17,16 @@
         </button>
         <div class="collapse navbar-collapse" id="publicNavbar">
             <ul class="navbar-nav ms-auto">
+                <?php $cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/cart">
+                        <i class="bi bi-cart"></i> Carrito
+                        <?php if ($cart_count > 0): ?>
+                            <span class="badge bg-primary rounded-pill"><?php echo $cart_count; ?></span>
+                        <?php endif; ?>
+                    </a>
+                </li>
+
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -44,3 +54,4 @@
 </nav>
 
 <main class="container mt-5">
+    <?php \App\Helpers\FlashMessage::displayAllMessages(); ?>

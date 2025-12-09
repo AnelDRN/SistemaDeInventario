@@ -15,7 +15,11 @@ class SectionController extends BaseController
      */
     public function index(): void
     {
-        $this->authorizeAdmin();
+        if (!$this->hasPermission('can_manage_sections')) {
+            FlashMessage::setMessage('No tienes permiso para gestionar secciones.', 'danger');
+            $this->redirect('public/index.php?/admin/dashboard');
+            return;
+        }
 
         $pageTitle = 'Gestión de Secciones';
         $errors = [];
@@ -44,7 +48,11 @@ class SectionController extends BaseController
      */
     public function save(): void
     {
-        $this->authorizeAdmin();
+        if (!$this->hasPermission('can_manage_sections')) {
+            FlashMessage::setMessage('No tienes permiso para gestionar secciones.', 'danger');
+            $this->redirect('public/index.php?/admin/dashboard');
+            return;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = isset($_POST['id']) && !empty($_POST['id']) ? (int)$_POST['id'] : null;
@@ -76,7 +84,11 @@ class SectionController extends BaseController
      */
     public function delete(): void
     {
-        $this->authorizeAdmin();
+        if (!$this->hasPermission('can_manage_sections')) {
+            FlashMessage::setMessage('No tienes permiso para gestionar secciones.', 'danger');
+            $this->redirect('public/index.php?/admin/dashboard');
+            return;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
