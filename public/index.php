@@ -74,9 +74,16 @@ try {
     // Usamos QUERY_STRING para URLs del tipo: /public/index.php?/admin/users
     $url = $_SERVER['QUERY_STRING'] ?? '';
 
-    // Separar la ruta de los parámetros GET para que el router no se confunda
-    $parts = explode('?', $url, 2);
-    $route_path = $parts[0];
+    // Extraer la parte de la ruta del QUERY_STRING.
+    // La QUERY_STRING puede ser "admin/inventario" o "admin/inventario&search=faro"
+    // o "admin/inventario?param=value".
+    // Queremos solo la parte que el router debe usar para el matching de rutas.
+    
+    // Primero, obtener la parte antes del primer '?' si existe
+    $route_path_with_query = strtok($url, '?'); 
+
+    // Luego, de esa parte, obtener lo que esté antes del primer '&' si existe
+    $route_path = strtok($route_path_with_query, '&');
     
     $router->dispatch($route_path);
 } catch (\Throwable $e) { // Cambiado a Throwable para capturar todo tipo de errores
