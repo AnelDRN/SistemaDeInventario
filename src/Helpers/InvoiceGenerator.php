@@ -93,11 +93,8 @@ class InvoiceGenerator extends \FPDF
      */
     public function generateMultiItemPdf(array $orderDetails, int $orderId, string $customerName, string $orderDate): void
     {
-        error_log("DEBUG: InvoiceGenerator::generateMultiItemPdf - Method called. Order ID: " . $orderId);
         $this->AliasNbPages();
-        error_log("DEBUG: InvoiceGenerator::generateMultiItemPdf - AliasNbPages() called.");
         $this->AddPage();
-        error_log("DEBUG: InvoiceGenerator::generateMultiItemPdf - AddPage() called.");
         $this->SetFont('Times','',12);
 
         // Order Details
@@ -148,9 +145,7 @@ class InvoiceGenerator extends \FPDF
         $this->Cell(30,10,'$' . number_format($grandTotal, 2),0,1,'R');
 
         // Output PDF
-        error_log("DEBUG: InvoiceGenerator::generateMultiItemPdf - Calling Output().");
         $this->Output('D', 'Factura_Pedido_' . $orderId . '.pdf');
-        error_log("DEBUG: InvoiceGenerator::generateMultiItemPdf - Output() returned. Calling exit()."); // This line should ideally not be logged
         exit;
     }
 

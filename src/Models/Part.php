@@ -224,25 +224,15 @@ class Part
         }
         $query .= " ORDER BY fecha_creacion DESC";
         
-        // --- Debugging Start ---
-        error_log("DEBUG: Part::searchBySection - Statement prepared and about to execute. Query (positional): " . $query . " Params: " . print_r($params, true));
-        // --- Debugging End ---
-
         $stmt = $pdo->prepare(trim($query)); // Add trim() here
         $stmt->execute($params);
-        error_log("DEBUG: Part::searchBySection - Statement executed."); // New log here
         
         $parts = [];
         while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            error_log("DEBUG: Part::searchBySection - Fetched row data: " . print_r($data, true)); // New log inside loop
             $part = new self();
             $part->fromArray($data);
             $parts[] = $part;
         }
-
-        // --- Debugging Start ---
-        error_log("DEBUG: Part::searchBySection - Found " . count($parts) . " parts.");
-        // --- Debugging End ---
 
         return $parts;
     }

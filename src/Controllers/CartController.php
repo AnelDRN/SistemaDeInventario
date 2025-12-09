@@ -298,9 +298,7 @@ class CartController extends BaseController
      */
     public function downloadInvoice(): void
     {
-        error_log("DEBUG: CartController::downloadInvoice - Method called.");
         if (!isset($_SESSION['latest_order']) || !isset($_SESSION['latest_order_metadata'])) {
-            error_log("DEBUG: CartController::downloadInvoice - Session data for order not found. Redirecting.");
             // Redirect to home or cart if no order data is found
             $this->redirect('public/index.php?');
             return;
@@ -308,16 +306,14 @@ class CartController extends BaseController
 
         $order_details = $_SESSION['latest_order'];
         $order_metadata = $_SESSION['latest_order_metadata'];
-        error_log("DEBUG: CartController::downloadInvoice - Order data retrieved from session. Order ID: " . $order_metadata['order_id']);
 
         $invoiceGenerator = new InvoiceGenerator();
-        error_log("DEBUG: CartController::downloadInvoice - InvoiceGenerator instantiated. Calling generateMultiItemPdf.");
         $invoiceGenerator->generateMultiItemPdf(
             $order_details,
             $order_metadata['order_id'],
             $order_metadata['customer_name'],
             $order_metadata['order_date']
         );
-        error_log("DEBUG: CartController::downloadInvoice - generateMultiItemPdf returned (should not happen due to exit())."); // This line should ideally not be logged
+        // generateMultiItemPdf calls exit()
     }
 }
