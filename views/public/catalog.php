@@ -10,11 +10,11 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">Rastro de Partes</a>
+            <a class="navbar-brand" href="<?php echo BASE_URL; ?>/public/index.php">Rastro de Partes</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="login.php">Admin Login</a>
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/login">Admin Login</a>
                     </li>
                 </ul>
             </div>
@@ -38,14 +38,14 @@
                 <?php foreach ($parts as $part): ?>
                     <div class="col">
                         <div class="card h-100">
-                            <img src="<?php echo htmlspecialchars($part->getThumbnailUrl() ?? 'assets/img/placeholder.png'); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($part->getNombre()); ?>" style="height: 200px; object-fit: cover;">
+                            <img src="<?php echo BASE_URL; ?>/<?php echo htmlspecialchars($part->getThumbnailUrl() ?? 'assets/img/placeholder.png'); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($part->getNombre()); ?>" style="height: 200px; object-fit: cover;">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($part->getNombre()); ?></h5>
                                 <p class="card-text text-muted"><?php echo htmlspecialchars($part->getMarcaAuto() . ' ' . $part->getModeloAuto()); ?></p>
                                 <h6 class="card-subtitle mb-2 text-success">$<?php echo number_format($part->getPrecio(), 2); ?></h6>
                             </div>
                             <div class="card-footer text-center">
-                                <a href="detalle.php?id=<?php echo $part->getId(); ?>" class="btn btn-primary">Ver Detalles</a>
+                                <a href="<?php echo BASE_URL; ?>/public/index.php?/part/<?php echo $part->getId(); ?>" class="btn btn-primary">Ver Detalles</a>
                             </div>
                         </div>
                     </div>

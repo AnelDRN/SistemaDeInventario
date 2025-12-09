@@ -5,7 +5,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>Lista de Usuarios</span>
-        <a href="usuario_form.php" class="btn btn-primary">Crear Nuevo Usuario</a>
+        <a href="index.php?/admin/users/create" class="btn btn-primary">Crear Nuevo Usuario</a>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -38,11 +38,11 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="usuario_form.php?id=<?php echo $user->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="index.php?/admin/users/edit/<?php echo $user->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
                                     <?php if ($user->isActivo()): ?>
-                                        <a href="usuario_accion.php?action=deactivate&id=<?php echo $user->getId(); ?>" class="btn btn-sm btn-danger">Desactivar</a>
+                                        <a href="index.php?/admin/users/deactivate/<?php echo $user->getId(); ?>" class="btn btn-sm btn-danger">Desactivar</a>
                                     <?php else: ?>
-                                        <a href="usuario_accion.php?action=activate&id=<?php echo $user->getId(); ?>" class="btn btn-sm btn-success">Activar</a>
+                                        <a href="index.php?/admin/users/activate/<?php echo $user->getId(); ?>" class="btn btn-sm btn-success">Activar</a>
                                     <?php endif; ?>
                                 </td>
                             </tr>

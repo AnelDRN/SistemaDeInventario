@@ -99,6 +99,6 @@
     - **Posición Actual:** Fase 0 - Configuración.
     - **Siguiente Tarea Inmediata:**
         - [ ] Crear estructura de carpetas en `www`.
-        - [ ] Diseñar Script SQL (Tablas: `usuarios`, `roles`, `partes`, `secciones`, `vendido_parte`, `comentarios`).
+        - [x] Diseñar Script SQL (Tablas: `usuarios`, `roles`, `partes`, `secciones`, `vendido_parte`, `comentarios`).
 ```
 

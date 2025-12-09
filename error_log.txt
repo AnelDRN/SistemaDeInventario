@@ -1,0 +1,19 @@
+[09-Dec-2025 00:39:47 UTC] PartController::save - Image upload failed for new part. $_FILES['imagen'] content: Array
+(
+    [name] => P6070004.JPG
+    [full_path] => P6070004.JPG
+    [type] => 
+    [tmp_name] => 
+    [error] => 1
+    [size] => 0
+)
+
+[09-Dec-2025 00:46:52 UTC] PartController::save - Image upload failed for new part. $_FILES['imagen'] content: Array
+(
+    [name] => P6070004.JPG
+    [full_path] => P6070004.JPG
+    [type] => 
+    [tmp_name] => 
+    [error] => 1
+    [size] => 0
+)

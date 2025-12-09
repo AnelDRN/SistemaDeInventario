@@ -10,11 +10,11 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">Rastro de Partes</a>
+            <a class="navbar-brand" href="<?php echo BASE_URL; ?>/public/index.php">Rastro de Partes</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="login.php">Admin Login</a>
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/login">Admin Login</a>
                     </li>
                 </ul>
             </div>
@@ -25,7 +25,7 @@
         <div class="row">
             <!-- Columna de la Imagen -->
             <div class="col-lg-6">
-                <img src="<?php echo htmlspecialchars($part->getImagenUrl() ?? 'assets/img/placeholder_large.png'); ?>" class="img-fluid rounded shadow" alt="<?php echo htmlspecialchars($part->getNombre()); ?>">
+                <img src="<?php echo BASE_URL; ?>/<?php echo htmlspecialchars($part->getImagenUrl() ?? 'assets/img/placeholder_large.png'); ?>" class="img-fluid rounded shadow" alt="<?php echo htmlspecialchars($part->getNombre()); ?>">
             </div>
 
             <!-- Columna de Detalles -->
@@ -34,7 +34,7 @@
                 <p class="lead"><?php echo htmlspecialchars($part->getDescripcion() ?? 'Sin descripción.'); ?></p>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Auto:</strong> <?php echo htmlspecialchars($part->getMarcaAuto() . ' ' . $part->getModeloAuto()); ?></li>
-                    <li class="list-group-item"><strong>Año:</strong> <?php echo htmlspecialchars($part->getAñoAuto() ?? 'N/A'); ?></li>
+                    <li class="list-group-item"><strong>Año:</strong> <?php echo htmlspecialchars($part->getAnioAuto() ?? 'N/A'); ?></li>
                     <li class="list-group-item"><strong>Tipo de Parte:</strong> <?php echo htmlspecialchars($part->getTipoParte() ?? 'N/A'); ?></li>
                     <li class="list-group-item"><strong>Cantidad Disponible:</strong> <?php echo htmlspecialchars($part->getCantidadDisponible()); ?></li>
                     <li class="list-group-item bg-light">
@@ -55,7 +55,8 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <?php if (isset($_SESSION['user_id'])): ?>
-                            <form action="detalle.php?id=<?php echo $part->getId(); ?>" method="POST">
+                            <form action="<?php echo BASE_URL; ?>/public/index.php?/part/comment" method="POST">
+                                <input type="hidden" name="part_id" value="<?php echo $part->getId(); ?>">
                                 <div class="mb-3">
                                     <label for="comment_text" class="form-label">Escribe tu comentario, <?php echo htmlspecialchars($_SESSION['username']); ?>:</label>
                                     <textarea class="form-control" id="comment_text" name="comment_text" rows="3" required></textarea>
@@ -64,7 +65,7 @@
                             </form>
                         <?php else: ?>
                             <div class="alert alert-info">
-                                <a href="login.php">Inicia sesión</a> para dejar un comentario.
+                                <a href="<?php echo BASE_URL; ?>/public/index.php?/login">Inicia sesión</a> para dejar un comentario.
                             </div>
                         <?php endif; ?>
                         

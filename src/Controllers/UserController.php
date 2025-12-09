@@ -5,52 +5,70 @@ namespace App\Controllers;
 
 use App\Core\BaseController;
 use App\Models\User;
+use App\Models\Role;
 use App\Helpers\Sanitizer;
+use App\Helpers\FlashMessage;
 
 class UserController extends BaseController
 {
     private User $userModel;
 
-    public function __construct()
+    public function __construct(array $params = [])
     {
+        parent::__construct($params);
         $this->userModel = new User();
     }
 
-    /**
-     * Shows the login form.
-     */
     public function showLoginForm(): void
     {
-        $this->view('admin/login');
+        // Si el usuario ya está logueado, redirigir al panel de admin.
+        if (isset($_SESSION['user_id'])) {
+            // Aún no hemos refactorizado el dashboard, así que apuntamos al archivo antiguo.
+            $this->redirect('public/index.php?/admin/dashboard');
+            return;
+        }
+
+        // Mostrar la vista del formulario de login
+        $this->view('admin/login', ['pageTitle' => 'Login']);
     }
 
     /**
-     * Handles user login.
+     * Handles user login processing.
      */
     public function login(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = Sanitizer::sanitizeString($_POST['username'] ?? '');
-            $password = $_POST['password'] ?? ''; // Password not sanitized before hashing/verification
+        // Si se intenta acceder por GET, redirigir al formulario
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('public/index.php?/login');
+            return;
+        }
 
+        $username = Sanitizer::sanitizeString($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $error = null;
+
+        if (empty($username) || empty($password)) {
+            $error = "El nombre de usuario y la contraseña son requeridos.";
+        } else {
             $user = User::findByUsername($username);
 
             if ($user && password_verify($password, $user->getPasswordHash()) && $user->isActivo()) {
-                // Login successful
-                // In a real application, start session, set cookies, etc.
+                // Login exitoso: guardar datos en la sesión
                 $_SESSION['user_id'] = $user->getId();
                 $_SESSION['username'] = $user->getNombreUsuario();
                 $_SESSION['role_id'] = $user->getRolId();
 
-                // Redirect to admin dashboard or home
-                $this->redirect('/admin/dashboard'); // Assuming a dashboard route
+                // Redirigir al nuevo dashboard MVC
+                $this->redirect('public/index.php?/admin/dashboard');
+                return;
             } else {
-                // Login failed
-                $this->view('admin/login', ['error' => 'Usuario o contraseña incorrectos, o usuario inactivo.']);
+                // Fallo en el login
+                $error = 'Usuario o contraseña incorrectos, o la cuenta está inactiva.';
             }
-        } else {
-            $this->redirect('/login'); // Redirect to show form on GET request
         }
+
+        // Si hay un error, volver a mostrar el formulario con el mensaje
+        $this->view('admin/login', ['pageTitle' => 'Login', 'error' => $error]);
     }
 
     /**
@@ -60,7 +78,7 @@ class UserController extends BaseController
     {
         session_unset();
         session_destroy();
-        $this->redirect('/login');
+        $this->redirect('public/index.php?/login');
     }
 
     /**
@@ -71,7 +89,15 @@ class UserController extends BaseController
         $this->authorizeAdmin();
 
         $users = User::findAll();
-        $this->view('admin/users/index', ['users' => $users]);
+        
+        // Cargar roles para mostrar en la vista, como en el script original
+        $roles = Role::findAll();
+        $roleMap = [];
+        foreach ($roles as $role) {
+            $roleMap[$role->getId()] = $role->getNombre();
+        }
+
+        $this->view('admin/users/index', ['users' => $users, 'roleMap' => $roleMap]);
     }
 
     /**
@@ -80,102 +106,178 @@ class UserController extends BaseController
     public function create(): void
     {
         $this->authorizeAdmin();
-        $this->view('admin/users/create_edit'); // Use a generic form for create/edit
+        $roles = Role::findAll();
+        $pageTitle = 'Crear Usuario';
+        $this->view('admin/users/form', [
+            'isEditMode' => false, 
+            'user' => new User(), 
+            'roles' => $roles,
+            'pageTitle' => $pageTitle
+        ]);
     }
 
     /**
-     * Stores a new user or updates an existing one.
+     * Stores a new user in the database.
      */
     public function store(): void
     {
         $this->authorizeAdmin();
+        $pageTitle = 'Crear Usuario'; // Define pageTitle for re-rendering on error
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = Sanitizer::sanitizeArray($_POST); // Sanitize all POST data
+            $data = Sanitizer::sanitizeArray($_POST);
+            $errors = $this->validateUserData($data, false, null);
 
-            $id = $data['id'] ?? null;
-            $username = $data['username'] ?? '';
-            $email = $data['email'] ?? '';
-            $password = $data['password'] ?? '';
-            $rol_id = $data['rol_id'] ?? 2; // Default to Vendedor if not specified
-            $activo = isset($data['activo']) && $data['activo'] === 'on' ? true : false;
-
-            // Basic validation
-            $errors = [];
-            if (empty($username)) $errors[] = "El nombre de usuario es requerido.";
-            if (!Sanitizer::validateEmail($email)) $errors[] = "El email no es válido.";
-            if (empty($password) && $id === null) $errors[] = "La contraseña es requerida para un nuevo usuario.";
+            $user = new User();
+            $this->populateUserData($user, $data);
 
             if (empty($errors)) {
-                $user = ($id !== null) ? User::findById((int)$id) : new User();
-                if (!$user && $id !== null) {
-                    $errors[] = "Usuario a actualizar no encontrado.";
-                } elseif ($user) {
-                    $user->setNombreUsuario($username);
-                    $user->setEmail($email);
-                    if (!empty($password)) { // Only update password if provided
-                        $user->setPasswordHash(password_hash($password, PASSWORD_DEFAULT));
-                    }
-                    $user->setRolId((int)$rol_id);
-                    $user->setActivo($activo);
+                $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
 
-                    if ($user->save()) {
-                        $this->redirect('/admin/users');
-                    } else {
-                        $errors[] = "Error al guardar el usuario.";
-                    }
+                if ($user->save()) {
+                    FlashMessage::setMessage('Usuario creado con éxito.', 'success');
+                    $this->redirect('public/index.php?/admin/users');
+                } else {
+                    $errors[] = "Error al guardar el usuario.";
                 }
             }
-            $this->view('admin/users/create_edit', ['errors' => $errors, 'user' => $_POST]); // Pass back original POST data for form repopulation
+            
+            // Si hay errores, volver a mostrar el formulario con los datos y errores
+            $roles = Role::findAll();
+            $this->view('admin/users/form', [
+                'errors' => $errors, 
+                'user' => $user, // Pasar el objeto User poblado
+                'isEditMode' => false,
+                'roles' => $roles,
+                'pageTitle' => $pageTitle
+            ]);
         } else {
-            $this->redirect('/admin/users');
+            $this->redirect('public/index.php?/admin/users');
         }
+    }
+    
+    /**
+     * Shows the form to edit an existing user.
+     */
+    public function edit(): void
+    {
+        $this->authorizeAdmin();
+        $id = (int)$this->params['id'];
+        $user = User::findById($id);
+
+        if (!$user) {
+            $this->redirect('public/index.php?/admin/users');
+            return;
+        }
+        
+        $roles = Role::findAll();
+        $pageTitle = 'Editar Usuario'; // Define pageTitle
+        $this->view('admin/users/form', [
+            'user' => $user, 
+            'isEditMode' => true,
+            'roles' => $roles,
+            'pageTitle' => $pageTitle
+        ]);
     }
 
     /**
-     * Shows the form to edit an existing user.
-     * @param int $id User ID.
+     * Updates an existing user in the database.
      */
-    public function edit(int $id): void
+    public function update(): void
     {
         $this->authorizeAdmin();
+        $pageTitle = 'Editar Usuario'; // Define pageTitle for re-rendering on error
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = (int)$this->params['id'];
+            $user = User::findById($id);
 
-        $user = User::findById($id);
-        if (!$user) {
-            $this->redirect('/admin/users'); // User not found
-            return;
+            if (!$user) {
+                $this->redirect('public/index.php?/admin/users');
+                return;
+            }
+
+            $data = Sanitizer::sanitizeArray($_POST);
+            $errors = $this->validateUserData($data, true, $id);
+
+            // Poblar el objeto user con los nuevos datos para la re-población del form
+            $this->populateUserData($user, $data);
+
+            if (empty($errors)) {
+                if (!empty($data['password'])) {
+                    $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
+                }
+
+                if ($user->save()) {
+                    FlashMessage::setMessage('Usuario actualizado con éxito.', 'success');
+                    $this->redirect('public/index.php?/admin/users');
+                } else {
+                    $errors[] = "Error al actualizar el usuario.";
+                }
+            }
+            
+            // Si hay errores, volver a mostrar el formulario con los datos y errores
+            $roles = Role::findAll();
+            $this->view('admin/users/form', [
+                'errors' => $errors, 
+                'user' => $user, // Pasar el objeto User poblado
+                'isEditMode' => true, 
+                'pageTitle' => $pageTitle,
+                'roles' => $roles
+            ]);
+        } else {
+            $this->redirect('public/index.php?/admin/users');
         }
-        $this->view('admin/users/create_edit', ['user' => $user]);
     }
 
     /**
      * Deactivates a user (soft delete).
-     * @param int $id User ID.
      */
-    public function deactivate(int $id): void
+    public function deactivate(): void
     {
         $this->authorizeAdmin();
-
+        $id = (int)$this->params['id'];
         $user = User::findById($id);
-        if ($user && $user->softDelete()) {
-            // Success
+
+        if ($user) {
+            if ($user->softDelete()) {
+                 FlashMessage::setMessage('Usuario desactivado con éxito.', 'warning');
+            }
         }
-        $this->redirect('/admin/users');
+        $this->redirect('public/index.php?/admin/users');
+    }
+    
+    // --- Métodos privados de ayuda ---
+
+    private function validateUserData(array $data, bool $isEditMode, ?int $userId = null): array
+    {
+        $errors = [];
+        if (empty($data['nombre_usuario'])) $errors[] = "El nombre de usuario es requerido.";
+        if (!Sanitizer::validateEmail($data['email'])) $errors[] = "El formato del email no es válido.";
+        if (!$isEditMode && empty($data['password'])) {
+            $errors[] = "La contraseña es requerida para nuevos usuarios.";
+        }
+
+        // Verificar unicidad de nombre de usuario
+        $userByUsername = User::findByUsername($data['nombre_usuario']);
+        if ($userByUsername && $userByUsername->getId() !== $userId) {
+            $errors[] = "El nombre de usuario '" . htmlspecialchars($data['nombre_usuario']) . "' ya está en uso.";
+        }
+
+        // Verificar unicidad de email
+        $userByEmail = User::findByEmail($data['email']);
+        if ($userByEmail && $userByEmail->getId() !== $userId) {
+            $errors[] = "El email '" . htmlspecialchars($data['email']) . "' ya está registrado.";
+        }
+        
+        return $errors;
     }
 
-    /**
-     * Activates a user.
-     * @param int $id User ID.
-     */
-    public function activate(int $id): void
+    private function populateUserData(User $user, array $data): void
     {
-        $this->authorizeAdmin();
-
-        $user = User::findById($id);
-        if ($user) {
-            $user->setActivo(true);
-            $user->save();
-        }
-        $this->redirect('/admin/users');
+        $user->setNombreUsuario($data['nombre_usuario'] ?? '');
+        $user->setEmail($data['email'] ?? '');
+        $user->setRolId((int)($data['rol_id'] ?? 2));
+        $user->setActivo(isset($data['activo']));
     }
 }

@@ -17,7 +17,7 @@ INSERT INTO `usuarios` (`id`, `nombre_usuario`, `email`, `password_hash`, `rol_i
 
 -- Insertar Partes de ejemplo
 -- Las imágenes son placeholders del servicio placehold.co
-INSERT INTO `partes` (`id`, `nombre`, `descripcion`, `tipo_parte`, `marca_auto`, `modelo_auto`, `año_auto`, `precio`, `cantidad_disponible`, `imagen_url`, `thumbnail_url`, `seccion_id`) VALUES
+INSERT INTO `partes` (`id`, `nombre`, `descripcion`, `tipo_parte`, `marca_auto`, `modelo_auto`, `anio_auto`, `precio`, `cantidad_disponible`, `imagen_url`, `thumbnail_url`, `seccion_id`) VALUES
 (1, 'Faro Delantero Izquierdo', 'Faro de halógeno original, en buenas condiciones, con leves signos de uso.', 'Iluminación', 'Honda', 'Civic', 2018, 120.50, 5, 'https://placehold.co/800x600/EEE/31343C.png?text=Faro+Honda+Civic', 'https://placehold.co/400x300/EEE/31343C.png?text=Faro', 1),
 (2, 'Puerta del Conductor', 'Puerta completa con panel interior y vidrio. Color rojo. Sin golpes mayores.', 'Carrocería', 'Toyota', 'Corolla', 2016, 350.00, 2, 'https://placehold.co/800x600/EEE/31343C.png?text=Puerta+Toyota', 'https://placehold.co/400x300/EEE/31343C.png?text=Puerta', 2),
 (3, 'Alternador 90A', 'Alternador remanufacturado, probado y funcional. Compatible con varios modelos de Ford.', 'Eléctrico', 'Ford', 'Focus', 2014, 95.75, 8, 'https://placehold.co/800x600/EEE/31343C.png?text=Alternador+Ford', 'https://placehold.co/400x300/EEE/31343C.png?text=Alternador', 1),

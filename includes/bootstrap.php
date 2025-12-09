@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+// Forzar la visualización de errores para depuración
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+
 // =================================================================
 // BOOTSTRAP.PHP - El corazón de la aplicación
 // Este archivo se incluirá en cada script de página (ej. login.php, admin/usuarios.php)
@@ -8,6 +12,15 @@ declare(strict_types=1);
 
 // 1. Definir la ruta raíz del proyecto para tener rutas de archivo consistentes.
 define('ROOT_PATH', dirname(__DIR__));
+
+// Definir la URL base para construir URLs absolutas.
+// Esto asume una estructura de carpetas estándar de WAMP.
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$host = $_SERVER['HTTP_HOST'];
+$script_name = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+// Limpiar el script_name para que apunte al directorio raíz del proyecto
+$project_root = rtrim(str_replace('/public', '', $script_name), '/');
+define('BASE_URL', $protocol . '://' . $host . $project_root);
 
 // 2. Configurar el manejo de errores global
 // Esto captura cualquier error de PHP o excepción no controlada y muestra una página de error.

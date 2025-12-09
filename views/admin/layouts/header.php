@@ -11,7 +11,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">
+        <a class="navbar-brand" href="<?php echo BASE_URL; ?>/public/index.php?/admin/dashboard">
             <i class="bi bi-box-seam"></i>
             Admin Rastro
         </a>
@@ -21,24 +21,24 @@
         <div class="collapse navbar-collapse" id="adminNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="usuarios.php">Usuarios</a>
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/users">Usuarios</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="roles.php">Roles</a>
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/roles">Roles</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="secciones.php">Secciones</a>
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/secciones">Secciones</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="inventario.php">Inventario</a>
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario">Inventario</a>
                 </li>
                  <li class="nav-item">
-                    <a class="nav-link" href="comentarios.php">Comentarios</a>
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/comentarios">Comentarios</a>
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto">
                  <li class="nav-item">
-                    <a class="nav-link" href="../index.php" target="_blank">
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php" target="_blank">
                         <i class="bi bi-eye"></i> Ver Sitio Público
                     </a>
                 </li>
@@ -47,7 +47,7 @@
                         <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION['username'] ?? 'Usuario'); ?>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="../login.php?action=logout">Cerrar Sesión</a></li>
+                        <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/public/index.php?/logout">Cerrar Sesión</a></li>
                     </ul>
                 </li>
             </ul>
@@ -56,4 +56,5 @@
 </nav>
 
 <main class="container mt-4">
+    <?php \App\Helpers\FlashMessage::displayAllMessages(); ?>
     <!-- El contenido de la página específica se insertará aquí -->

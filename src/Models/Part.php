@@ -15,7 +15,7 @@ class Part
     private ?string $tipo_parte;
     private ?string $marca_auto;
     private ?string $modelo_auto;
-    private ?int $año_auto;
+    private ?int $anio_auto;
     private float $precio;
     private int $cantidad_disponible;
     private ?string $imagen_url;
@@ -35,7 +35,7 @@ class Part
         $this->tipo_parte = null;
         $this->marca_auto = null;
         $this->modelo_auto = null;
-        $this->año_auto = null;
+        $this->anio_auto = null;
         $this->precio = 0.0;
         $this->cantidad_disponible = 0;
         $this->imagen_url = null;
@@ -52,7 +52,7 @@ class Part
     public function getTipoParte(): ?string { return $this->tipo_parte; }
     public function getMarcaAuto(): ?string { return $this->marca_auto; }
     public function getModeloAuto(): ?string { return $this->modelo_auto; }
-    public function getAñoAuto(): ?int { return $this->año_auto; }
+    public function getAnioAuto(): ?int { return $this->anio_auto; }
     public function getPrecio(): float { return $this->precio; }
     public function getCantidadDisponible(): int { return $this->cantidad_disponible; }
     public function getImagenUrl(): ?string { return $this->imagen_url; }
@@ -68,7 +68,7 @@ class Part
     public function setTipoParte(?string $tipo_parte): void { $this->tipo_parte = $tipo_parte ? Sanitizer::sanitizeString($tipo_parte) : null; }
     public function setMarcaAuto(?string $marca_auto): void { $this->marca_auto = $marca_auto ? Sanitizer::sanitizeString($marca_auto) : null; }
     public function setModeloAuto(?string $modelo_auto): void { $this->modelo_auto = $modelo_auto ? Sanitizer::sanitizeString($modelo_auto) : null; }
-    public function setAñoAuto(?int $año_auto): void { $this->año_auto = $año_auto; }
+    public function setAnioAuto(?int $anio_auto): void { $this->anio_auto = $anio_auto; }
     public function setPrecio(float $precio): void { $this->precio = $precio; }
     public function setCantidadDisponible(int $cantidad): void { $this->cantidad_disponible = $cantidad; }
     public function setImagenUrl(?string $url): void { $this->imagen_url = $url; }
@@ -86,7 +86,7 @@ class Part
         $this->tipo_parte = $data['tipo_parte'] ?? null;
         $this->marca_auto = $data['marca_auto'] ?? null;
         $this->modelo_auto = $data['modelo_auto'] ?? null;
-        $this->año_auto = isset($data['año_auto']) ? (int)$data['año_auto'] : null;
+        $this->anio_auto = isset($data['anio_auto']) ? (int)$data['anio_auto'] : null;
         $this->precio = isset($data['precio']) ? (float)$data['precio'] : 0.0;
         $this->cantidad_disponible = isset($data['cantidad_disponible']) ? (int)$data['cantidad_disponible'] : 0;
         $this->imagen_url = $data['imagen_url'] ?? null;
@@ -196,7 +196,7 @@ class Part
             ':tipo_parte' => $this->tipo_parte,
             ':marca_auto' => $this->marca_auto,
             ':modelo_auto' => $this->modelo_auto,
-            ':año_auto' => $this->año_auto,
+            ':anio_auto' => $this->anio_auto,
             ':precio' => $this->precio,
             ':cantidad_disponible' => $this->cantidad_disponible,
             ':imagen_url' => $this->imagen_url,
@@ -211,25 +211,25 @@ class Part
 
     private function getInsertSql(): string
     {
-        return "INSERT INTO partes (nombre, descripcion, tipo_parte, marca_auto, modelo_auto, año_auto, precio, cantidad_disponible, imagen_url, thumbnail_url, seccion_id) 
-                VALUES (:nombre, :descripcion, :tipo_parte, :marca_auto, :modelo_auto, :año_auto, :precio, :cantidad_disponible, :imagen_url, :thumbnail_url, :seccion_id)";
+        return "INSERT INTO `partes` (`nombre`, `descripcion`, `tipo_parte`, `marca_auto`, `modelo_auto`, `anio_auto`, `precio`, `cantidad_disponible`, `imagen_url`, `thumbnail_url`, `seccion_id`) 
+                VALUES (:nombre, :descripcion, :tipo_parte, :marca_auto, :modelo_auto, :anio_auto, :precio, :cantidad_disponible, :imagen_url, :thumbnail_url, :seccion_id)";
     }
 
     private function getUpdateSql(): string
     {
-        return "UPDATE partes SET 
-                    nombre = :nombre, 
-                    descripcion = :descripcion, 
-                    tipo_parte = :tipo_parte, 
-                    marca_auto = :marca_auto, 
-                    modelo_auto = :modelo_auto, 
-                    año_auto = :año_auto, 
-                    precio = :precio, 
-                    cantidad_disponible = :cantidad_disponible, 
-                    imagen_url = :imagen_url, 
-                    thumbnail_url = :thumbnail_url, 
-                    seccion_id = :seccion_id
-                WHERE id = :id";
+        return "UPDATE `partes` SET 
+                    `nombre` = :nombre, 
+                    `descripcion` = :descripcion, 
+                    `tipo_parte` = :tipo_parte, 
+                    `marca_auto` = :marca_auto, 
+                    `modelo_auto` = :modelo_auto, 
+                    `anio_auto` = :anio_auto, 
+                    `precio` = :precio, 
+                    `cantidad_disponible` = :cantidad_disponible, 
+                    `imagen_url` = :imagen_url, 
+                    `thumbnail_url` = :thumbnail_url, 
+                    `seccion_id` = :seccion_id
+                WHERE `id` = :id";
     }
 
     /**

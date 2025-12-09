@@ -16,8 +16,7 @@
         <?php echo $sectionToEdit->getId() ? 'Editar Sección' : 'Crear Nueva Sección'; ?>
     </div>
     <div class="card-body">
-        <form action="secciones.php" method="POST">
-            <input type="hidden" name="action" value="save">
+        <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/secciones/save" method="POST">
             <input type="hidden" name="id" value="<?php echo htmlspecialchars($sectionToEdit->getId() ?? ''); ?>">
             
             <div class="mb-3">
@@ -57,9 +56,8 @@
                     <td><?php echo htmlspecialchars($section->getNombre()); ?></td>
                     <td><?php echo htmlspecialchars($section->getDescripcion() ?? 'N/A'); ?></td>
                     <td>
-                        <a href="secciones.php?action=edit&id=<?php echo $section->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
-                        <form action="secciones.php" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar esta sección?');" style="display: inline;">
-                            <input type="hidden" name="action" value="delete">
+                        <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/secciones/edit/<?php echo $section->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
+                        <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/secciones/delete" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar esta sección?');" style="display: inline;">
                             <input type="hidden" name="id" value="<?php echo $section->getId(); ?>">
                             <button type="submit" class="btn btn-sm btn-danger">Borrar</button>
                         </form>

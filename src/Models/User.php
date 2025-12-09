@@ -116,6 +116,34 @@ class User
     }
 
     /**
+     * Finds a user by their email.
+     * @param string $email
+     * @return User|null
+     */
+    public static function findByEmail(string $email): ?self
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email");
+        $stmt->execute(['email' => Sanitizer::sanitizeString($email)]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$data) {
+            return null;
+        }
+
+        return new self(
+            $data['id'],
+            $data['nombre_usuario'],
+            $data['email'],
+            $data['password_hash'],
+            $data['rol_id'],
+            (bool)$data['activo'],
+            $data['fecha_creacion'],
+            $data['fecha_actualizacion']
+        );
+    }
+
+    /**
      * Saves the user data to the database (either inserts or updates).
      * @return bool True on success, false on failure.
      */

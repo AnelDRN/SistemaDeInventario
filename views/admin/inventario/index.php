@@ -5,15 +5,15 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>Inventario de Partes</span>
-        <a href="inventario_form.php" class="btn btn-primary">Añadir Nueva Parte</a>
+        <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario/create" class="btn btn-primary">Añadir Nueva Parte</a>
     </div>
     <div class="card-body">
         <div class="mb-3">
-            <form action="inventario.php" method="GET" class="d-flex">
+            <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario" method="GET" class="d-flex">
                 <input type="text" name="search" class="form-control me-2" placeholder="Buscar por nombre, tipo, marca..." value="<?php echo htmlspecialchars($searchTerm); ?>">
                 <button type="submit" class="btn btn-info">Buscar</button>
                 <?php if(!empty($searchTerm)): ?>
-                     <a href="inventario.php" class="btn btn-outline-secondary ms-2">Limpiar</a>
+                     <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario" class="btn btn-outline-secondary ms-2">Limpiar</a>
                 <?php endif; ?>
             </form>
         </div>
@@ -41,20 +41,19 @@
                         <?php foreach ($parts as $part): ?>
                             <tr>
                                 <td>
-                                    <img src="../<?php echo htmlspecialchars($part->getThumbnailUrl() ?? 'assets/img/placeholder.png'); ?>" alt="Thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                    <img src="<?php echo BASE_URL; ?>/<?php echo htmlspecialchars($part->getThumbnailUrl() ?? 'assets/img/placeholder.png'); ?>" alt="Thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                 </td>
                                 <td><?php echo htmlspecialchars($part->getNombre()); ?></td>
                                 <td><?php echo htmlspecialchars($part->getTipoParte() ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($part->getMarcaAuto() . ' ' . $part->getModeloAuto()); ?></td>
-                                <td><?php echo htmlspecialchars($part->getAñoAuto() ?? 'N/A'); ?></td>
+                                <td><?php echo htmlspecialchars($part->getAnioAuto() ?? 'N/A'); ?></td>
                                 <td>$<?php echo number_format($part->getPrecio(), 2); ?></td>
                                 <td><?php echo htmlspecialchars($part->getCantidadDisponible()); ?></td>
                                 <td><?php echo htmlspecialchars($sectionMap[$part->getSeccionId()] ?? 'N/A'); ?></td>
                                 <td>
-                                    <a href="venta_form.php?part_id=<?php echo $part->getId(); ?>" class="btn btn-sm btn-success <?php echo $part->getCantidadDisponible() > 0 ? '' : 'disabled'; ?>">Vender</a>
-                                    <a href="inventario_form.php?id=<?php echo $part->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
-                                    <form action="inventario_accion.php" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar esta parte?');" style="display: inline;">
-                                        <input type="hidden" name="action" value="delete">
+                                    <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/venta/<?php echo $part->getId(); ?>" class="btn btn-sm btn-success <?php echo $part->getCantidadDisponible() > 0 ? '' : 'disabled'; ?>">Vender</a>
+                                    <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario/edit/<?php echo $part->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
+                                    <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario/delete" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar esta parte?');" style="display: inline;">
                                         <input type="hidden" name="id" value="<?php echo $part->getId(); ?>">
                                         <button type="submit" class="btn btn-sm btn-danger">Borrar</button>
                                     </form>

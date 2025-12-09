@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
-    <a href="inventario.php" class="btn btn-secondary">Volver al Inventario</a>
+    <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario" class="btn btn-secondary">Volver al Inventario</a>
 </div>
 
 <?php if (!empty($errors)): ?>
@@ -16,7 +16,10 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="inventario_form.php<?php echo $isEditMode ? '?id=' . htmlspecialchars($part->getId()) : ''; ?>" method="POST" enctype="multipart/form-data">
+        <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario/save" method="POST" enctype="multipart/form-data">
+            <?php if ($isEditMode): ?>
+                <input type="hidden" name="id" value="<?php echo htmlspecialchars($part->getId()); ?>">
+            <?php endif; ?>
             
             <div class="row">
                 <div class="col-md-8">
@@ -34,12 +37,12 @@
                     <?php if ($isEditMode && $part->getThumbnailUrl()): ?>
                         <div class="mb-3 text-center">
                             <label class="form-label">Imagen Actual</label>
-                            <img src="../<?php echo htmlspecialchars($part->getThumbnailUrl()); ?>" class="img-thumbnail" alt="Imagen actual">
+                            <img src="<?php echo BASE_URL; ?>/<?php echo htmlspecialchars($part->getThumbnailUrl()); ?>" class="img-thumbnail" alt="Imagen actual">
                         </div>
                     <?php endif; ?>
                     <div class="mb-3">
                         <label for="imagen" class="form-label"><?php echo $isEditMode ? 'Reemplazar Imagen' : 'Imagen de la Parte'; ?></label>
-                        <input class="form-control" type="file" id="imagen" name="imagen" <?php echo !$isEditMode ? 'required' : ''; ?>>
+                        <input class="form-control" type="file" id="imagen" name="imagen" <?php echo !$isEditMode && empty($part->getImagenUrl()) ? 'required' : ''; ?>>
                         <div class="form-text">Formatos: JPG, PNG, GIF. Tamaño máx: 5MB.</div>
                     </div>
                 </div>
@@ -79,8 +82,8 @@
                     <input type="text" class="form-control" id="modelo_auto" name="modelo_auto" value="<?php echo htmlspecialchars($part->getModeloAuto() ?? ''); ?>">
                 </div>
                 <div class="col-md-3">
-                    <label for="año_auto" class="form-label">Año</label>
-                    <input type="number" class="form-control" id="año_auto" name="año_auto" value="<?php echo htmlspecialchars($part->getAñoAuto() ?? ''); ?>" placeholder="Ej: 2015">
+                    <label for="anio_auto" class="form-label">Año</label>
+                    <input type="number" class="form-control" id="anio_auto" name="anio_auto" value="<?php echo htmlspecialchars($part->getAnioAuto() ?? ''); ?>" placeholder="Ej: 2015">
                 </div>
             </div>
 
@@ -101,7 +104,7 @@
             </div>
 
             <div class="d-flex justify-content-end gap-2 mt-4">
-                <a href="inventario.php" class="btn btn-secondary">Cancelar</a>
+                <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario" class="btn btn-secondary">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
             </div>
         </form>

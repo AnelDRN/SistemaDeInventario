@@ -16,11 +16,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="usuario_form.php<?php echo $isEditMode ? '?id=' . htmlspecialchars($user->getId()) : ''; ?>" method="POST">
-            
-            <?php if ($isEditMode): ?>
-                <input type="hidden" name="id" value="<?php echo htmlspecialchars($user->getId()); ?>">
-            <?php endif; ?>
+        <form action="<?php echo $isEditMode ? 'index.php?/admin/users/update/' . htmlspecialchars($user->getId()) : 'index.php?/admin/users/store'; ?>" method="POST">
 
             <div class="mb-3">
                 <label for="nombre_usuario" class="form-label">Nombre de Usuario:</label>
@@ -43,10 +39,11 @@
             <div class="mb-3">
                 <label for="rol_id" class="form-label">Rol:</label>
                 <select class="form-select" id="rol_id" name="rol_id" required>
-                    <!-- Idealmente, estos roles vendrían de la tabla `roles` de la BD -->
-                    <option value="1" <?php echo $user->getRolId() === 1 ? 'selected' : ''; ?>>Administrador</option>
-                    <option value="2" <?php echo $user->getRolId() === 2 ? 'selected' : ''; ?>>Vendedor</option>
-                    <option value="3" <?php echo $user->getRolId() === 3 ? 'selected' : ''; ?>>Cliente</option>
+                    <?php foreach ($roles as $role): ?>
+                        <option value="<?php echo $role->getId(); ?>" <?php echo ($user->getRolId() === $role->getId()) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($role->getNombre()); ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             
@@ -56,7 +53,7 @@
             </div>
 
             <div class="d-flex justify-content-end gap-2">
-                <a href="usuarios.php" class="btn btn-secondary">Cancelar</a>
+                <a href="index.php?/admin/users" class="btn btn-secondary">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
             </div>
         </form>

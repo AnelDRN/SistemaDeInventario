@@ -16,8 +16,7 @@
         <?php echo $roleToEdit->getId() ? 'Editar Rol' : 'Crear Nuevo Rol'; ?>
     </div>
     <div class="card-body">
-        <form action="roles.php" method="POST">
-            <input type="hidden" name="action" value="save">
+        <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/roles/save" method="POST">
             <input type="hidden" name="id" value="<?php echo htmlspecialchars($roleToEdit->getId() ?? ''); ?>">
             
             <div class="row">
@@ -52,10 +51,9 @@
                     <td><?php echo htmlspecialchars($role->getId()); ?></td>
                     <td><?php echo htmlspecialchars($role->getNombre()); ?></td>
                     <td>
-                        <a href="roles.php?action=edit&id=<?php echo $role->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/roles/edit/<?php echo $role->getId(); ?>" class="btn btn-sm btn-warning">Editar</a>
                         <?php if ($role->getId() > 3): // No permitir borrar roles básicos ?>
-                        <form action="roles.php" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar este rol?');" style="display: inline;">
-                            <input type="hidden" name="action" value="delete">
+                        <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/roles/delete" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar este rol?');" style="display: inline;">
                             <input type="hidden" name="id" value="<?php echo $role->getId(); ?>">
                             <button type="submit" class="btn btn-sm btn-danger">Borrar</button>
                         </form>

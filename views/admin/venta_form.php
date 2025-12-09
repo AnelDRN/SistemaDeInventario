@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
-    <a href="inventario.php" class="btn btn-secondary">Cancelar</a>
+    <a href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario" class="btn btn-secondary">Cancelar</a>
 </div>
 
 <?php if (!empty($errors)): ?>
@@ -18,7 +18,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-4">
-                <img src="../<?php echo htmlspecialchars($part->getThumbnailUrl() ?? 'assets/img/placeholder.png'); ?>" class="img-fluid rounded" alt="Thumbnail">
+                <img src="<?php echo BASE_URL; ?>/<?php echo htmlspecialchars($part->getThumbnailUrl() ?? 'assets/img/placeholder.png'); ?>" class="img-fluid rounded" alt="Thumbnail">
             </div>
             <div class="col-md-8">
                 <h4 class="card-title"><?php echo htmlspecialchars($part->getNombre()); ?></h4>
@@ -30,7 +30,8 @@
 
         <hr>
 
-        <form action="venta_form.php?part_id=<?php echo $part->getId(); ?>" method="POST">
+        <form action="<?php echo BASE_URL; ?>/public/index.php?/admin/venta/process" method="POST">
+            <input type="hidden" name="part_id" value="<?php echo $part->getId(); ?>">
             <div class="mb-3">
                 <label for="precio_venta" class="form-label"><strong>Precio de Venta Final</strong></label>
                 <div class="input-group">
