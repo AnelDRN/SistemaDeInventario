@@ -21,14 +21,19 @@ class UserController extends BaseController
 
     public function showLoginForm(): void
     {
-        // Si el usuario ya está logueado, redirigir al panel de admin.
+        // If user is already logged in, redirect based on role
         if (isset($_SESSION['user_id'])) {
-            // Aún no hemos refactorizado el dashboard, así que apuntamos al archivo antiguo.
-            $this->redirect('public/index.php?/admin/dashboard');
+            // Admin users go to the dashboard
+            if ($_SESSION['role_id'] === 1) {
+                $this->redirect('public/index.php?/admin/dashboard');
+            } else {
+                // Other users (e.g., Clientes) go to the home page
+                $this->redirect('public/index.php');
+            }
             return;
         }
 
-        // Mostrar la vista del formulario de login
+        // Show the login form for guests
         $this->view('admin/login', ['pageTitle' => 'Login']);
     }
 
@@ -79,6 +84,76 @@ class UserController extends BaseController
         session_unset();
         session_destroy();
         $this->redirect('public/index.php?/login');
+    }
+
+    /**
+     * Shows the public user registration form.
+     */
+    public function showRegistrationForm(): void
+    {
+        // If user is already logged in, redirect to home
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('public/index.php');
+            return;
+        }
+
+        $this->view('public/register', [
+            'pageTitle' => 'Crear Nueva Cuenta',
+            'nombre_usuario' => '',
+            'email' => '',
+            'errors' => []
+        ]);
+    }
+
+    /**
+     * Processes the public user registration form.
+     */
+    public function register(): void
+    {
+        // If user is already logged in, redirect
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('public/index.php');
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = Sanitizer::sanitizeArray($_POST);
+            
+            $errors = $this->validateUserData($data, false, null);
+
+            if (empty($errors)) {
+                $user = new User();
+                $user->setNombreUsuario($data['nombre_usuario']);
+                $user->setEmail($data['email']);
+                $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
+                $user->setRolId(3); // Force role to 3 (Cliente) for public registration
+                $user->setActivo(true);
+
+                if ($user->save()) {
+                    // Automatically log in the new user
+                    $_SESSION['user_id'] = $user->getId();
+                    $_SESSION['username'] = $user->getNombreUsuario();
+                    $_SESSION['role_id'] = $user->getRolId();
+
+                    FlashMessage::setMessage('¡Registro exitoso! Ya puedes comentar.', 'success');
+                    $this->redirect('public/index.php'); // Redirect to home page
+                    return;
+                } else {
+                    $errors[] = "Hubo un error al guardar el usuario en la base de datos.";
+                }
+            }
+            
+            // If there are errors, show the form again with the data
+            $this->view('public/register', [
+                'errors' => $errors,
+                'nombre_usuario' => $data['nombre_usuario'] ?? '',
+                'email' => $data['email'] ?? '',
+                'pageTitle' => 'Crear Nueva Cuenta'
+            ]);
+
+        } else {
+            $this->redirect('public/index.php?/register');
+        }
     }
 
     /**
@@ -246,6 +321,23 @@ class UserController extends BaseController
         }
         $this->redirect('public/index.php?/admin/users');
     }
+
+    /**
+     * Activates a user.
+     */
+    public function activate(): void
+    {
+        $this->authorizeAdmin();
+        $id = (int)$this->params['id'];
+        $user = User::findById($id);
+
+        if ($user) {
+            $user->setActivo(true);
+            $user->save();
+            FlashMessage::setMessage('Usuario activado con éxito.', 'success');
+        }
+        $this->redirect('public/index.php?/admin/users');
+    }
     
     // --- Métodos privados de ayuda ---
 
@@ -277,7 +369,9 @@ class UserController extends BaseController
     {
         $user->setNombreUsuario($data['nombre_usuario'] ?? '');
         $user->setEmail($data['email'] ?? '');
-        $user->setRolId((int)($data['rol_id'] ?? 2));
+        if (isset($data['rol_id'])) {
+            $user->setRolId((int)$data['rol_id']);
+        }
         $user->setActivo(isset($data['activo']));
     }
 }

@@ -122,8 +122,6 @@ class PartController extends BaseController
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
             $this->handleImageUpload($part, $errors);
         } elseif (!$isEditMode) {
-            // Debugging: Log the $_FILES['imagen'] array to see the actual error code
-            error_log("PartController::save - Image upload failed for new part. \$_FILES['imagen'] content: " . print_r($_FILES['imagen'] ?? [], true));
             $errors[] = "Debe seleccionar una imagen para la nueva parte.";
         }
 

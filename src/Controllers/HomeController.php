@@ -41,7 +41,7 @@ class HomeController extends BaseController
         }
 
         $pageTitle = htmlspecialchars($part->getNombre());
-        $comments = Comment::findAllByPartId($part->getId(), 'aprobado');
+        $comments = Comment::findAndThreadByPartId($part->getId());
         $errors = FlashMessage::getMessages('errors'); // Recuperar errores si los hay
         $successMessage = FlashMessage::getMessages('success'); // Recuperar mensajes de éxito
 
@@ -65,6 +65,7 @@ class HomeController extends BaseController
         }
 
         $partId = (int)($_POST['part_id'] ?? 0);
+        $parentId = isset($_POST['parent_id']) && !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
         $commentText = Sanitizer::sanitizeString($_POST['comment_text'] ?? '');
         
         if (!isset($_SESSION['user_id'])) {
@@ -75,10 +76,11 @@ class HomeController extends BaseController
             $comment = new Comment();
             $comment->setParteId($partId);
             $comment->setUsuarioId((int)$_SESSION['user_id']);
+            $comment->setParentId($parentId);
             $comment->setTextoComentario($commentText);
             
             if ($comment->save()) {
-                FlashMessage::setMessages('success', ['Tu comentario ha sido enviado y está pendiente de aprobación.']);
+                FlashMessage::setMessage('Comentario añadido con éxito.', 'success');
             } else {
                 FlashMessage::setMessages('errors', ['Hubo un error al guardar tu comentario.']);
             }

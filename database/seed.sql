@@ -25,7 +25,7 @@ INSERT INTO `partes` (`id`, `nombre`, `descripcion`, `tipo_parte`, `marca_auto`,
 (5, 'Caja de Transmisión Automática', 'Transmisión automática de 6 velocidades, extraída de un vehículo con bajo kilometraje.', 'Transmisión', 'Nissan', 'Sentra', 2019, 950.00, 1, 'https://placehold.co/800x600/EEE/31343C.png?text=Transmision+Nissan', 'https://placehold.co/400x300/EEE/31343C.png?text=Transmision', 3);
 
 -- Insertar Comentarios de ejemplo
-INSERT INTO `comentarios` (`id`, `parte_id`, `usuario_id`, `texto_comentario`, `estado`) VALUES
-(1, 1, 2, '¿Esta parte es compatible con el modelo 2017?', 'aprobado'),
-(2, 2, 2, 'Me interesa, ¿aún está disponible?', 'pendiente'),
-(3, 1, 1, 'Sí, es compatible con los modelos 2016 a 2019.', 'aprobado');
+INSERT INTO `comentarios` (`id`, `parte_id`, `usuario_id`, `texto_comentario`) VALUES
+(1, 1, 2, '¿Esta parte es compatible con el modelo 2017?'),
+(2, 2, 2, 'Me interesa, ¿aún está disponible?'),
+(3, 1, 1, 'Sí, es compatible con los modelos 2016 a 2019.');

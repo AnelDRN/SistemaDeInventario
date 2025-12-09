@@ -73,12 +73,13 @@ CREATE TABLE IF NOT EXISTS `comentarios` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `parte_id` INT NOT NULL,
     `usuario_id` INT NOT NULL,
+    `parent_id` INT NULL DEFAULT NULL,
     `texto_comentario` TEXT NOT NULL,
-    `estado` ENUM('pendiente', 'aprobado', 'rechazado') NOT NULL DEFAULT 'pendiente', -- Moderación
     `fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`parte_id`) REFERENCES `partes`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`parent_id`) REFERENCES `comentarios`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

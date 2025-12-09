@@ -32,8 +32,8 @@
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/inventario">Inventario</a>
                 </li>
-                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/comentarios">Comentarios</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/public/index.php?/admin/reports">Reportes</a>
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto">

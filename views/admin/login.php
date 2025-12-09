@@ -42,6 +42,9 @@
                     <button type="submit" class="btn btn-primary">Entrar</button>
                 </div>
             </form>
+            <div class="text-center mt-3">
+                <p>¿No tienes una cuenta? <a href="<?php echo BASE_URL; ?>/public/index.php?/register">Crear una aquí</a></p>
+            </div>
         </div>
     </div>
     <!-- Bootstrap JS Bundle -->

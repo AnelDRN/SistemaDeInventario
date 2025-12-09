@@ -82,9 +82,19 @@ class SaleController extends BaseController
                 }
 
                 $pdo->commit();
-                FlashMessage::setMessage('Venta registrada con éxito.', 'success');
-                $this->redirect('public/index.php?/admin/inventario');
-                return;
+
+                // Generate Invoice
+                $saleData = [
+                    'sale_id' => $sale->getId(),
+                    'fecha_venta' => date('Y-m-d H:i:s'), // Current timestamp
+                    'vendedor_nombre' => $_SESSION['username'],
+                    'nombre_parte' => $part->getNombre(),
+                    'precio_venta' => $sale->getPrecioVenta()
+                ];
+
+                $invoiceGenerator = new \App\Helpers\InvoiceGenerator();
+                $invoiceGenerator->generate($saleData);
+                // The generate method handles exit()
 
             } catch (\Exception $e) {
                 $pdo->rollBack();

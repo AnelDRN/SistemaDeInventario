@@ -23,9 +23,12 @@ $router->add('part/comment', ['controller' => 'HomeController', 'action' => 'add
 $router->add('admin/venta/{id:\d+}', ['controller' => 'SaleController', 'action' => 'showForm']);
 $router->add('admin/venta/process', ['controller' => 'SaleController', 'action' => 'process']);
 
+// Rutas de Reportes
+$router->add('admin/reports', ['controller' => 'ReportController', 'action' => 'index']);
+$router->add('admin/reports/monthly', ['controller' => 'ReportController', 'action' => 'monthly']);
+
 // Rutas de Comentarios
-$router->add('admin/comentarios', ['controller' => 'CommentController', 'action' => 'index']);
-$router->add('admin/comentarios/action', ['controller' => 'CommentController', 'action' => 'action']);
+$router->add('admin/comment/delete', ['controller' => 'CommentController', 'action' => 'delete']);
 
 // Rutas de Inventario
 $router->add('admin/inventario', ['controller' => 'PartController', 'action' => 'index']);
@@ -53,6 +56,8 @@ $router->add('admin/dashboard', ['controller' => 'AdminController', 'action' => 
 $router->add('login', ['controller' => 'UserController', 'action' => 'showLoginForm']);
 $router->add('login/process', ['controller' => 'UserController', 'action' => 'login']);
 $router->add('logout', ['controller' => 'UserController', 'action' => 'logout']);
+$router->add('register', ['controller' => 'UserController', 'action' => 'showRegistrationForm']);
+$router->add('register/process', ['controller' => 'UserController', 'action' => 'register']);
 
 // Rutas de ejemplo para el módulo de usuarios (que migraremos)
 $router->add('admin/users', ['controller' => 'UserController', 'action' => 'index']);
@@ -68,7 +73,12 @@ $router->add('admin/users/activate/{id:\d+}', ['controller' => 'UserController',
 try {
     // Usamos QUERY_STRING para URLs del tipo: /public/index.php?/admin/users
     $url = $_SERVER['QUERY_STRING'] ?? '';
-    $router->dispatch($url);
+
+    // Separar la ruta de los parámetros GET para que el router no se confunda
+    $parts = explode('?', $url, 2);
+    $route_path = $parts[0];
+    
+    $router->dispatch($route_path);
 } catch (\Throwable $e) { // Cambiado a Throwable para capturar todo tipo de errores
     // Manejo de errores con más detalle para depuración
     http_response_code($e->getCode() === 404 ? 404 : 500);

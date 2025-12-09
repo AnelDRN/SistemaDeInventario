@@ -1,0 +1,43 @@
+Actúa como un Arquitecto de Software Senior y Redactor Técnico Experto. Tengo un proyecto de software (Sistema de Inventario o Rastreo) ya desarrollado y necesito generar su documentación técnica oficial basándome en el código fuente que te proporcionaré.
+
+Tu tarea es analizar el código, identificar la lógica de negocio, la estructura de datos y las tecnologías utilizadas, y redactar el siguiente documento estructurado.
+
+Por favor, genera la salida utilizando el siguiente índice exacto:
+
+1. Requisitos de Instalación del Sistema y Requisitos No Funcionales
+
+Instalación: Basado en los archivos de dependencias (ej. package.json, requirements.txt, pom.xml, etc.) y el tipo de proyecto, lista los pasos necesarios para instalar y ejecutar el proyecto. Menciona versiones de lenguaje y bases de datos necesarias.
+
+No Funcionales: Deduce 5 requisitos no funcionales lógicos para este tipo de sistema (Rendimiento, Seguridad, Disponibilidad, etc.) basándote en las buenas prácticas y las tecnologías que ves en el código.
+
+2. Modelado Funcional
+
+Casos de Uso: Identifica los 3-5 actores principales y lista los Casos de Uso (funcionalidades) más importantes que el código permite realizar (ej. "Registrar producto", "Generar reporte").
+
+Descripción Textual: Selecciona el caso de uso más crítico (ej. "Agregar Inventario") y descríbelo textualmente (Actor, Precondición, Flujo Normal, Postcondición).
+
+3. Estructura del Sistema (Modelo Estructural)
+
+Analiza la estructura de carpetas y archivos. Describe la arquitectura del software (ej. MVC, Microservicios, Capas).
+
+Crea un diagrama de texto o lista jerárquica explicando qué hace cada módulo/carpeta principal del código.
+
+4. Modelo Dinámico
+
+Elige una funcionalidad clave del código.
+
+Describe el flujo lógico o "pseudo-diagrama de secuencia" de cómo viajan los datos desde que el usuario hace la petición hasta que se guarda en la base de datos (Vista -> Controlador -> Modelo -> BD).
+
+5. Base de Datos
+
+Script/Schema: Analiza los modelos (Models/Entities) o archivos SQL. Reconstruye y proporciona el Script SQL (CREATE TABLE...) o el esquema de las tablas principales que deduces del código.
+
+Diagrama E/R: Describe textualmente las relaciones entre las entidades (ej. "Un Usuario tiene muchos Movimientos").
+
+[INSTRUCCIONES ADICIONALES]:
+
+Usa un lenguaje técnico, formal y claro.
+
+Si falta información explícita en el código, haz inferencias lógicas basadas en estándares de la industria para sistemas de inventario.
+
+Utiliza genera un archivo con todo lo solicitado en un archivo markdown.

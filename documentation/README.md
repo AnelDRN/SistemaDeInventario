@@ -1,37 +1,36 @@
 # Documentación del Proyecto: Sistema de Inventario o Rastro
 
-**Versión:** 1.0
-**Fecha:** 01 de Diciembre de 2025
+**Versión:** 2.0
+**Fecha:** 09 de Diciembre de 2025
 **Autor:** Asistente Gemini (Arquitecto de Software)
 
 ---
 
 ## 1. Introducción
 
-Este documento detalla la arquitectura, diseño y requisitos del "Sistema de Inventario o Rastro". El objetivo es construir una aplicación web modular, robusta y escalable utilizando PHP nativo, siguiendo el patrón MVC y preparándola para una futura migración a un entorno Docker.
+Este documento detalla la arquitectura, diseño y requisitos del "Sistema de Inventario o Rastro". El objetivo es construir una aplicación web modular y robusta utilizando PHP nativo y el patrón MVC. La versión actual incluye un sistema de inventario funcional, gestión de usuarios con diferentes roles, un portal público de catálogo, un sistema de comentarios anidados y generación de reportes de ventas en PDF.
 
 ---
 
 ## 2. Arquitectura del Sistema
 
 -   **Patrón de Diseño:** Modelo-Vista-Controlador (MVC).
--   **Enfoque de Programación:** Orientada a Objetos (POO).
--   **Estructura de Archivos:** El sistema se organiza en carpetas dedicadas para `public` (front-controller, assets), `src` (lógica de negocio, controladores, modelos), `views` (plantillas), `config` (configuración) y `database` (scripts SQL).
+-   **Enfoque de Programación:** Orientada a Objetos (POO) con tipado estricto de PHP 8.
+-   **Estructura de Archivos:** El sistema se organiza en carpetas dedicadas para `public` (front-controller), `src` (lógica de negocio), `views` (plantillas), `config` (conexión a BD), `database` (scripts SQL) y `libs` (dependencias de terceros como FPDF).
 
 ---
 
 ## 3. Diagramas UML
 
-Esta sección contiene los diagramas UML que modelan el sistema desde diferentes perspectivas.
-
 ### 3.1. Diagrama de Casos de Uso
 
-El siguiente diagrama ilustra las interacciones de los usuarios (actores) con el sistema y las funcionalidades principales.
+El siguiente diagrama ilustra las interacciones de los actores con las funcionalidades principales del sistema.
 
 ```mermaid
 graph TD
     subgraph "Actores"
         Admin((Administrador))
+        Cliente((Cliente Registrado))
         Visitante((Visitante))
     end
 
@@ -39,114 +38,107 @@ graph TD
         UC1[Ver Catálogo de Partes]
         UC2[Buscar Partes]
         UC3[Ver Detalle de Parte]
-        UC4[Escribir Comentario]
-        UC5[Gestionar Usuarios]
-        UC6[Gestionar Inventario de Partes]
-        UC7[Moderar Comentarios]
-        UC8[Ver Reporte de Ventas]
-        UC9[Realizar Venta]
+        UC4[Registrar Cuenta]
+        UC5[Publicar Comentario]
+        UC6[Responder a Comentario]
+        UC7[Gestionar Inventario]
+        UC8[Gestionar Usuarios y Roles]
+        UC9[Registrar Venta y Generar Factura]
+        UC10[Generar Reporte de Ventas]
+        UC11[Eliminar Comentario]
     end
 
-    %% Conexiones de Visitante
+    %% Relaciones
     Visitante -- "Consulta" --> UC1
     Visitante -- "Consulta" --> UC2
     Visitante -- "Consulta" --> UC3
-    Visitante -- "Participa" --> UC4
+    Visitante -- "Se registra para ser" --> UC4
 
-    %% Conexiones de Administrador
-    Admin -- "Gestiona" --> UC5
-    Admin -- "Gestiona" --> UC6
+    Cliente -- "Hereda de" --> Visitante
+    Cliente -- "Participa con" --> UC5
+    Cliente -- "Interactúa con" --> UC6
+
+    Admin -- "Hereda de" --> Cliente
     Admin -- "Gestiona" --> UC7
-    Admin -- "Supervisa" --> UC8
+    Admin -- "Gestiona" --> UC8
     Admin -- "Ejecuta" --> UC9
-
-    %% Admin también puede hacer lo que hace el visitante
-    Admin -- "Hereda capacidades de" --> Visitante
+    Admin -- "Supervisa con" --> UC10
+    Admin -- "Modera con" --> UC11
 ```
 
 **Descripción de Actores:**
--   **Visitante:** Cualquier usuario público que navega por el sitio. No requiere autenticación para las funciones básicas de consulta.
--   **Administrador:** Un usuario autenticado con privilegios elevados para gestionar todos los aspectos del sistema.
-
----
-
-*(Las siguientes secciones se completarán progresivamente)*
+-   **Visitante:** Usuario anónimo. Puede navegar el catálogo y registrarse.
+-   **Cliente Registrado:** Usuario con cuenta. Puede comentar y responder.
+-   **Administrador:** Usuario con privilegios totales, incluyendo gestión de inventario, usuarios y ventas.
 
 ### 3.2. Diagrama de Clases
 
-Este diagrama detalla la estructura estática del sistema. Define las clases, sus atributos, métodos y las relaciones entre ellas, sirviendo como un plano para la implementación del código.
+Este diagrama detalla la estructura estática del sistema en su estado actual.
 
 ```mermaid
 classDiagram
     direction BT
 
-    class IErrorHandler {
-        <<Interface>>
-        +logError(message: string, context: array) void
+    class FPDF {
+        <<Library>>
+        +AddPage()
+        +SetFont()
+        +Cell()
+        +Output()
     }
 
-    class FileLogger {
-        +logError(message: string, context: array) void
+    class InvoiceGenerator {
+        +generate(saleData: array) void
     }
-    IErrorHandler <|.. FileLogger : implements
+    FPDF <|-- InvoiceGenerator
 
     class Database {
         <<Singleton>>
-        -static $instance: Database
-        -pdo: PDO
-        -Database()
         +static getInstance(): Database
         +getConnection(): PDO
     }
 
-    class Sanitizer {
-        +sanitizeString(input: string): string
-        +validateEmail(email: string): bool
-    }
-
-    class ImageHelper {
-        +createThumbnail(sourcePath: string, destPath: string, width: int): bool
-        +uploadImage(file: array, destPath: string): string
-    }
-
     class BaseController {
         #view(viewName: string, data: array) void
+        #redirect(url: string) void
+        #authorizeAdmin() void
     }
 
+    class HomeController {
+        +index() void
+        +show() void
+        +addComment() void
+    }
+    BaseController <|-- HomeController
+
     class UserController {
-        -userModel: User
-        +login(request: array) void
-        +listUsers() void
-        +updateUser(id: int, data: array) void
-        +deactivateUser(id: int) void
+        +showLoginForm() void
+        +login() void
+        +logout() void
+        +showRegistrationForm() void
+        +register() void
     }
     BaseController <|-- UserController
 
-    class PartController {
-        -partModel: Part
-        +listAll() void
-        +show(id: int) void
-        +create(data: array) void
-        +update(id: int, data: array) void
-    }
-    BaseController <|-- PartController
-
     class SaleController {
-        -saleModel: Sale
-        -partModel: Part
-        +createSale(partId: int, price: float) bool
+        +showForm() void
+        +process() void
     }
     BaseController <|-- SaleController
+
+    class ReportController {
+        +index() void
+        +monthly() void
+    }
+    BaseController <|-- ReportController
 
 
     class User {
         -id: int
-        -nombre: string
-        -email: string
-        -password_hash: string
-        -activo: bool
-        -roleId: int
+        -nombre_usuario: string
+        -rol_id: int
         +findById(id: int): User
+        +findByUsername(username: string): User
         +save(): bool
         +softDelete(): bool
     }
@@ -159,103 +151,87 @@ classDiagram
     class Part {
         -id: int
         -nombre: string
-        -descripcion: string
-        -marca_auto: string
-        -modelo_auto: string
-        -año_auto: int
-        -imagenUrl: string
-        -thumbnailUrl: string
-        -sectionId: int
+        -cantidad_disponible: int
         +findById(id: int): Part
-        +findAll(): array
+        +decrementStock(amount: int): bool
         +save(): bool
-    }
-
-    class Section {
-        -id: int
-        -nombre: string
-        -descripcion: string
     }
 
     class Sale {
         -id: int
-        -partId: int
-        -usuarioVendedorId: int
-        -precioVenta: float
-        -fechaVenta: datetime
-        +createRecord(data: array): bool
+        -precio_venta: float
+        +save(): bool
+        +findSalesByMonth(year: int, month: int): array
     }
 
     class Comment {
         -id: int
-        -partId: int
-        -usuarioId: int
-        -texto: string
-        -estado: string
-        +findByPart(partId: int): array
+        -parent_id: int
+        -texto_comentario: string
         +save(): bool
-        +approve(): bool
+        +delete(): bool
+        +findAndThreadByPartId(partId: int): array
     }
 
     %% Relationships
-    UserController ..> User : uses
-    PartController ..> Part : uses
-    SaleController ..> Sale : uses
+    HomeController ..> Part : uses
+    HomeController ..> Comment : uses
     SaleController ..> Part : uses
-
-    User "1" -- "1" Role : has a
-    Part "1" -- "1" Section : is in
-    Part "1" -- "0..*" Comment : has
-    Sale "1" -- "1" User : sold by
-    Sale "1" -- "1" Part : is for
-
-    %% Helpers and Core
-    UserController ..> Sanitizer : uses
-    PartController ..> Sanitizer : uses
-    PartController ..> ImageHelper : uses
+    SaleController ..> Sale : uses
+    SaleController ..> InvoiceGenerator : uses
+    ReportController ..> Sale : uses
+    UserController ..> User : uses
     
-    User ..> Database : uses
-    Part ..> Database : uses
-    Sale ..> Database : uses
-    Comment ..> Database : uses
+    Comment "0..*" -- "1" Comment : is reply to
+    User "1" -- "1" Role : has a
+    Part "1" -- "0..*" Comment : has
+    User "1" -- "0..*" Comment : writes
+    Sale "1" -- "1" User : sold by
 ```
 
-### 3.3. Diagrama de Secuencia: Realizar Venta
+### 3.3. Diagrama de Secuencia: Registrar Venta
 
-Este diagrama muestra la secuencia de interacciones entre los objetos del sistema durante el proceso de venta de una parte. Este es un flujo de trabajo crítico que demuestra el patrón MVC en acción.
+Este diagrama muestra el flujo actualizado para registrar una venta, que ahora incluye la generación de una factura en PDF.
 
 ```mermaid
 sequenceDiagram
-    actor Administrador
+    actor Admin
     participant SaleController
     participant PartModel as "Part (Model)"
     participant SaleModel as "Sale (Model)"
+    participant InvoiceGenerator
     participant Database
 
-    Administrador->>SaleController: createSale(partId, price)
+    Admin->>SaleController: process(part_id, precio_venta)
     activate SaleController
 
-    SaleController->>PartModel: findById(partId)
+    SaleController->>PartModel: findById(part_id)
     activate PartModel
     PartModel->>Database: SELECT * FROM partes WHERE id = ?
     Database-->>PartModel: partData
     PartModel-->>SaleController: partObject
     deactivate PartModel
 
-    SaleController->>SaleModel: createRecord(partData, price, adminId)
+    SaleController->>SaleModel: new Sale()
+    SaleController->>SaleModel: save()
     activate SaleModel
-    SaleModel->>Database: INSERT INTO vendido_parte (...) VALUES (...)
-    Database-->>SaleModel: success
+    SaleModel->>Database: INSERT INTO vendido_parte (...)
+    Database-->>SaleModel: success, lastInsertId
     SaleModel-->>SaleController: true
     deactivate SaleModel
 
-    SaleController->>PartModel: delete(partId)
+    SaleController->>PartModel: decrementStock(1)
     activate PartModel
-    PartModel->>Database: DELETE FROM partes WHERE id = ?
+    PartModel->>Database: UPDATE partes SET cantidad_disponible = ?
     Database-->>PartModel: success
     PartModel-->>SaleController: true
     deactivate PartModel
-    
-    SaleController-->>Administrador: "Venta registrada con éxito"
+
+    SaleController->>InvoiceGenerator: new InvoiceGenerator()
+    SaleController->>InvoiceGenerator: generate(saleData)
+    activate InvoiceGenerator
+    InvoiceGenerator-->>Admin: Descarga "Factura_123.pdf"
+    deactivate InvoiceGenerator
+
     deactivate SaleController
 ```

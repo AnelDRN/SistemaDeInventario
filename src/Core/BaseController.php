@@ -32,9 +32,14 @@ abstract class BaseController
                 require $file;
                 require_once ROOT_PATH . '/views/admin/layouts/footer.php';
             } else {
-                // For public views, we might have a different or no layout.
-                // For now, just include the file.
+                // Use the public layout for all other views
+                if (file_exists(ROOT_PATH . '/views/public/layouts/header.php')) {
+                    require_once ROOT_PATH . '/views/public/layouts/header.php';
+                }
                 require $file;
+                if (file_exists(ROOT_PATH . '/views/public/layouts/footer.php')) {
+                    require_once ROOT_PATH . '/views/public/layouts/footer.php';
+                }
             }
         } else {
             throw new \Exception("La vista $file no fue encontrada.");

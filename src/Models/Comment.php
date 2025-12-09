@@ -9,11 +9,11 @@ use App\Helpers\Sanitizer;
 
 class Comment
 {
-    private ?int $id;
+    private ?int $id = null;
     private int $parte_id;
-    private int $usuario_id; // O podría ser un nombre/email de invitado
+    private int $usuario_id;
+    private ?int $parent_id = null;
     private string $texto_comentario;
-    private string $estado; // 'pendiente', 'aprobado', 'rechazado'
     private ?string $fecha_creacion;
 
     private PDO $pdo;
@@ -26,51 +26,33 @@ class Comment
     public function getId(): ?int { return $this->id; }
     public function getParteId(): int { return $this->parte_id; }
     public function getUsuarioId(): int { return $this->usuario_id; }
+    public function getParentId(): ?int { return $this->parent_id; }
     public function getTextoComentario(): string { return $this->texto_comentario; }
-    public function getEstado(): string { return $this->estado; }
     public function getFechaCreacion(): ?string { return $this->fecha_creacion; }
 
     public function setParteId(int $id): void { $this->parte_id = $id; }
     public function setUsuarioId(int $id): void { $this->usuario_id = $id; }
+    public function setParentId(?int $id): void { $this->parent_id = $id; }
     public function setTextoComentario(string $texto): void { $this->texto_comentario = Sanitizer::sanitizeString($texto); }
-    public function setEstado(string $estado): void { $this->estado = $estado; }
 
     /**
-     * Saves a new comment to the database.
+     * Saves a new comment or reply to the database.
      */
     public function save(): bool
     {
-        // Por defecto, los nuevos comentarios estarán pendientes
-        $this->estado = 'pendiente';
-        
-        $sql = "INSERT INTO comentarios (parte_id, usuario_id, texto_comentario, estado) 
-                VALUES (:parte_id, :usuario_id, :texto_comentario, :estado)";
+        $sql = "INSERT INTO comentarios (parte_id, usuario_id, parent_id, texto_comentario) 
+                VALUES (:parte_id, :usuario_id, :parent_id, :texto_comentario)";
         
         $stmt = $this->pdo->prepare($sql);
         
         $params = [
             ':parte_id' => $this->parte_id,
-            ':usuario_id' => $this->usuario_id, // Asumimos que el usuario está logueado
+            ':usuario_id' => $this->usuario_id,
+            ':parent_id' => $this->parent_id,
             ':texto_comentario' => $this->texto_comentario,
-            ':estado' => $this->estado
         ];
 
         return $stmt->execute($params);
-    }
-    
-    /**
-     * Updates the status of a comment.
-     */
-    public function updateStatus(string $newStatus): bool
-    {
-        if (!$this->id) return false;
-        
-        $allowedStatus = ['aprobado', 'rechazado', 'pendiente'];
-        if (!in_array($newStatus, $allowedStatus)) return false;
-
-        $this->estado = $newStatus;
-        $stmt = $this->pdo->prepare("UPDATE comentarios SET estado = :estado WHERE id = :id");
-        return $stmt->execute([':estado' => $this->estado, ':id' => $this->id]);
     }
 
     /**
@@ -89,43 +71,41 @@ class Comment
     }
     
     /**
-     * Finds all comments for a specific part ID, optionally filtered by status.
+     * Finds all comments for a specific part ID and organizes them into a threaded structure.
      * Joins with `usuarios` to get the commenter's name.
      */
-    public static function findAllByPartId(int $partId, string $status = 'aprobado'): array
+    public static function findAndThreadByPartId(int $partId): array
     {
         $pdo = Database::getInstance()->getConnection();
         $sql = "SELECT c.*, u.nombre_usuario 
                 FROM comentarios c
                 JOIN usuarios u ON c.usuario_id = u.id
-                WHERE c.parte_id = :part_id AND c.estado = :status
-                ORDER BY c.fecha_creacion DESC";
+                WHERE c.parte_id = :part_id
+                ORDER BY c.fecha_creacion ASC"; // Order by ASC to build the tree correctly
         
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([':part_id' => $partId, ':status' => $status]);
+        $stmt->execute([':part_id' => $partId]);
         
-        $comments = [];
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $comments[] = $data; // Devolvemos un array asociativo simple para la vista
+        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Helper to build the tree
+        $grouped = [];
+        foreach ($comments as $comment) {
+            $grouped[$comment['parent_id'] ?? 0][] = $comment;
         }
-        return $comments;
-    }
-    
-    /**
-     * Finds all comments, regardless of part or status.
-     * Joins with `usuarios` and `partes` for a comprehensive admin view.
-     */
-    public static function findAllForAdmin(): array
-    {
-        $pdo = Database::getInstance()->getConnection();
-        $sql = "SELECT c.*, u.nombre_usuario, p.nombre as nombre_parte
-                FROM comentarios c
-                JOIN usuarios u ON c.usuario_id = u.id
-                JOIN partes p ON c.parte_id = p.id
-                ORDER BY c.fecha_creacion DESC";
-        
-        $stmt = $pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $buildTree = function(int $parentId = 0) use (&$grouped, &$buildTree) {
+            $branch = [];
+            if (isset($grouped[$parentId])) {
+                foreach ($grouped[$parentId] as $comment) {
+                    $comment['children'] = $buildTree($comment['id']);
+                    $branch[] = $comment;
+                }
+            }
+            return $branch;
+        };
+
+        return $buildTree(0);
     }
     
     /**
@@ -137,8 +117,8 @@ class Comment
         $comment->id = $data['id'];
         $comment->parte_id = $data['parte_id'];
         $comment->usuario_id = $data['usuario_id'];
+        $comment->parent_id = isset($data['parent_id']) ? (int)$data['parent_id'] : null;
         $comment->texto_comentario = $data['texto_comentario'];
-        $comment->estado = $data['estado'];
         $comment->fecha_creacion = $data['fecha_creacion'];
         return $comment;
     }
@@ -146,7 +126,9 @@ class Comment
     public function delete(): bool
     {
         if (!$this->id) return false;
+        // The ON DELETE CASCADE constraint on `parent_id` will handle deleting children.
         $stmt = $this->pdo->prepare("DELETE FROM comentarios WHERE id = :id");
         return $stmt->execute([':id' => $this->id]);
     }
 }
+

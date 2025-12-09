@@ -21,6 +21,11 @@ class Sale
     public function __construct() {
         $this->pdo = Database::getInstance()->getConnection();
     }
+
+    // --- Getters ---
+    public function getId(): ?int { return $this->id; }
+    public function getPrecioVenta(): float { return $this->precio_venta; }
+    
     
     // --- Setters ---
     public function setParteOriginalId(int $id): void { $this->parte_original_id = $id; }
@@ -83,6 +88,23 @@ class Sale
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retrieves all sales for a given month and year.
+     */
+    public static function findSalesByMonth(int $year, int $month): array
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $sql = "SELECT v.*, u.nombre_usuario AS vendedor_nombre
+                FROM vendido_parte v
+                JOIN usuarios u ON v.usuario_vendedor_id = u.id
+                WHERE YEAR(v.fecha_venta) = :year AND MONTH(v.fecha_venta) = :month
+                ORDER BY v.fecha_venta ASC";
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':year' => $year, ':month' => $month]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
