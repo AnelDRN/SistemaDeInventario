@@ -5,6 +5,16 @@
     </div>
 </div>
 
+<div class="mb-4">
+    <form action="<?php echo BASE_URL; ?>/public/index.php" method="GET" class="d-flex">
+        <input type="text" name="search" class="form-control me-2" placeholder="Buscar por nombre, tipo, marca..." value="<?php echo htmlspecialchars($searchTerm ?? ''); ?>">
+        <button type="submit" class="btn btn-info">Buscar</button>
+        <?php if(!empty($searchTerm)): ?>
+             <a href="<?php echo BASE_URL; ?>/public/index.php" class="btn btn-outline-secondary ms-2">Limpiar</a>
+        <?php endif; ?>
+    </form>
+</div>
+
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
     <?php if (empty($parts)): ?>
         <div class="col">

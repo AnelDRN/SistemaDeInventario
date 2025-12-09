@@ -17,12 +17,18 @@ class HomeController extends BaseController
     public function index(): void
     {
         $pageTitle = 'Catálogo de Partes';
-        $parts = Part::findAll(); // Asumiendo que este método ya es adecuado
+        $searchTerm = Sanitizer::sanitizeString($_GET['search'] ?? '');
 
-        // No es necesario un layout completo, la vista ya lo contiene
+        if (!empty($searchTerm)) {
+            $parts = Part::search($searchTerm);
+        } else {
+            $parts = Part::findAll();
+        }
+
         $this->view('public/catalog', [
             'pageTitle' => $pageTitle,
-            'parts' => $parts
+            'parts' => $parts,
+            'searchTerm' => $searchTerm // Pass searchTerm to the view
         ]);
     }
 
