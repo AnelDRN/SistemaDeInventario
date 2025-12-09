@@ -22,7 +22,8 @@ $router->add('cart/add', ['controller' => 'CartController', 'action' => 'add']);
 $router->add('cart/update', ['controller' => 'CartController', 'action' => 'update']);
 $router->add('cart/remove', ['controller' => 'CartController', 'action' => 'remove']);
 $router->add('cart/checkout', ['controller' => 'CartController', 'action' => 'checkout']);
-$router->add('cart/success', ['controller' => 'CartController', 'action' => 'success']);
+$router->add('cart/order-summary', ['controller' => 'CartController', 'action' => 'orderSummary']); // New route
+$router->add('cart/download-invoice', ['controller' => 'CartController', 'action' => 'downloadInvoice']); // New route
 
 // 3. Añadir las rutas de la aplicación
 // Sintaxis: $router->add('URL', ['controller' => 'NombreDelControlador', 'action' => 'nombreDeLaAccion']);
@@ -113,6 +114,17 @@ try {
 
     // Quitar barras iniciales/finales para normalizar la ruta
     $final_route = trim($final_route, '/');
+
+    // --- NEW LOGIC: Extract and parse query string from $final_route ---
+    $query_pos = strpos($final_route, '?');
+    if ($query_pos !== false) {
+        $query_string_from_route = substr($final_route, $query_pos + 1);
+        $final_route = substr($final_route, 0, $query_pos); // Update final_route to be just the path
+
+        parse_str($query_string_from_route, $parsed_get_params);
+        $_GET = array_merge($_GET, $parsed_get_params); // Merge into global $_GET
+    }
+    // --- END NEW LOGIC ---
     
     $router->dispatch($final_route);
 } catch (\Throwable $e) { // Cambiado a Throwable para capturar todo tipo de errores

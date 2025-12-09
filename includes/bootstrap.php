@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 // Forzar la visualización de errores para depuración
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
 
 // =================================================================
 // BOOTSTRAP.PHP - El corazón de la aplicación

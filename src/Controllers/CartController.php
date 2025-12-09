@@ -8,6 +8,7 @@ use App\Helpers\FlashMessage;
 use App\Models\Part;
 use App\Models\Sale;
 use App\Config\Database;
+use App\Helpers\InvoiceGenerator;
 
 class CartController extends BaseController
 {
@@ -207,6 +208,11 @@ class CartController extends BaseController
         try {
             $pdo->beginTransaction();
 
+            // Generate a unique order ID for this transaction (simple timestamp for now)
+            $orderId = time(); 
+            $orderDate = date('Y-m-d H:i:s');
+            $customerName = $_SESSION['username'] ?? 'Invitado'; // Should be logged in here
+
             foreach ($cart as $part_id => $item) {
                 $part = Part::findById($part_id);
 
@@ -215,7 +221,7 @@ class CartController extends BaseController
                     throw new \Exception('La parte "' . htmlspecialchars($item['name']) . '" ya no tiene stock suficiente.');
                 }
                 
-                // Create a sale record for each unit
+                // Create a sale record for each unit (as per existing structure)
                 for ($i = 0; $i < $item['quantity']; $i++) {
                     $sale = new Sale();
                     $sale->setParteOriginalId($part->getId());
@@ -236,11 +242,17 @@ class CartController extends BaseController
 
             $pdo->commit();
 
-            // Store order details for success page and clear cart
+            // Store order details and metadata for success/invoice page and clear cart
             $_SESSION['latest_order'] = $cart;
+            $_SESSION['latest_order_metadata'] = [
+                'order_id' => $orderId,
+                'order_date' => $orderDate,
+                'customer_name' => $customerName
+            ];
             unset($_SESSION['cart']);
 
-            $this->redirect('public/index.php?/cart/success');
+            // Redirect to order summary/invoice display
+            $this->redirect('public/index.php?/cart/order-summary');
 
         } catch (\Exception $e) {
             $pdo->rollBack();
@@ -249,22 +261,64 @@ class CartController extends BaseController
         }
     }
 
+
     /**
-     * Displays a success page after checkout.
+     * Displays the order summary and invoice after checkout.
      */
-    public function success(): void
+    public function orderSummary(): void
     {
-        if (!isset($_SESSION['latest_order'])) {
+        if (!isset($_SESSION['latest_order']) || !isset($_SESSION['latest_order_metadata'])) {
+            // Redirect to home or cart if no order data is found
             $this->redirect('public/index.php?');
             return;
         }
 
         $order_details = $_SESSION['latest_order'];
-        unset($_SESSION['latest_order']);
+        $order_metadata = $_SESSION['latest_order_metadata'];
 
-        $this->view('public/cart/success', [
-            'pageTitle' => '¡Compra Exitosa!',
-            'order' => $order_details
+        $invoiceGenerator = new InvoiceGenerator();
+        $invoiceHtml = $invoiceGenerator->getMultiItemHtml(
+            $order_details,
+            $order_metadata['order_id'],
+            $order_metadata['customer_name'],
+            $order_metadata['order_date']
+        );
+
+        unset($_SESSION['latest_order']); // Clear after displaying
+        unset($_SESSION['latest_order_metadata']); // Clear after displaying
+
+        $this->view('public/cart/order_summary', [
+            'pageTitle' => 'Resumen de tu Pedido y Factura',
+            'invoice_html' => $invoiceHtml,
+            'download_pdf_url' => BASE_URL . '/public/index.php?/cart/download-invoice'
         ]);
+    }
+
+    /**
+     * Handles the download of the order invoice as PDF.
+     */
+    public function downloadInvoice(): void
+    {
+        error_log("DEBUG: CartController::downloadInvoice - Method called.");
+        if (!isset($_SESSION['latest_order']) || !isset($_SESSION['latest_order_metadata'])) {
+            error_log("DEBUG: CartController::downloadInvoice - Session data for order not found. Redirecting.");
+            // Redirect to home or cart if no order data is found
+            $this->redirect('public/index.php?');
+            return;
+        }
+
+        $order_details = $_SESSION['latest_order'];
+        $order_metadata = $_SESSION['latest_order_metadata'];
+        error_log("DEBUG: CartController::downloadInvoice - Order data retrieved from session. Order ID: " . $order_metadata['order_id']);
+
+        $invoiceGenerator = new InvoiceGenerator();
+        error_log("DEBUG: CartController::downloadInvoice - InvoiceGenerator instantiated. Calling generateMultiItemPdf.");
+        $invoiceGenerator->generateMultiItemPdf(
+            $order_details,
+            $order_metadata['order_id'],
+            $order_metadata['customer_name'],
+            $order_metadata['order_date']
+        );
+        error_log("DEBUG: CartController::downloadInvoice - generateMultiItemPdf returned (should not happen due to exit())."); // This line should ideally not be logged
     }
 }

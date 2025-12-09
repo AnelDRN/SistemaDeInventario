@@ -215,15 +215,10 @@ class Part
 
         if ($sectionId !== null) {
             $query .= " AND seccion_id = :seccion_id";
-            $params[':seccion_id'] = $sectionId;
+            $params[':seccion_id'] = $sectionId; // FIX: Add the parameter to the array
         }
         $query .= " ORDER BY fecha_creacion DESC";
         
-        // --- Debugging Start ---
-        error_log("DEBUG: Part::searchBySection - SQL Query: " . $query);
-        error_log("DEBUG: Part::searchBySection - Parameters: " . print_r($params, true));
-        // --- Debugging End ---
-
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
         
@@ -233,10 +228,6 @@ class Part
             $part->fromArray($data);
             $parts[] = $part;
         }
-
-        // --- Debugging Start ---
-        error_log("DEBUG: Part::searchBySection - Found " . count($parts) . " parts.");
-        // --- Debugging End ---
 
         return $parts;
     }

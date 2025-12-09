@@ -95,40 +95,23 @@
 *Esta sección se actualiza al final de cada sesión.*
 
 **Sesión del 09/12/2025:**
-    - **Resumen:** Se ha realizado una reevaluación exhaustiva del proyecto contra `alcances2.md`, se han implementado numerosas funcionalidades pendientes y se ha abordado la mayoría de los puntos parcialmente cumplidos. Se resolvieron errores críticos de enrutamiento y búsqueda.
+    - **Resumen:** Se implementó la funcionalidad completa del carrito de compras y checkout, incluyendo la gestión de productos, cantidades, y un proceso de compra guiado. Se realizaron múltiples intentos de depuración y corrección de errores en el filtro de búsqueda del inventario administrativo.
     - **Hitos:**
-        - [x] **#1 Login:** Completado (funcional para administradores y clientes, incluye registro).
-        - [x] **#2 CRUD de Usuarios (Funcionalidad básica y Cambio de Contraseña):** Completado (gestión básica de usuarios, módulo de cambio de contraseña e interfaz diferenciada para "Operadores" implementados).
-        - [x] **#3 Módulo de registro de inventario (CRUD Inventario):** Completado (CRUD completo).
-        - [x] **#4 Guardar thumbnail y imágenes grandes:** Completado (imágenes y thumbnails guardados y mostrados).
-        - [x] **#7 Módulo de Secciones o Categorías:** Completado (CRUD de secciones).
-        - [x] **#8 El Módulo de registro de inventario debe permitir consultas, búsquedas por nombre, por tipo de coche:** Completado (búsqueda por nombre/tipo de coche y filtrado por tipo de parte en admin y catálogo público).
-        - [x] **#9 La conexión debe realizarse mediante una clase:** Completado.
-        - [x] **#10 Implementar control de Errores:** Completado.
-        - [x] **#11 Clase de sanitizar y validar datos:** Completado.
-        - [x] **#12 Implementar una Interfaz como mínimo en el Proyecto:** Completado.
-        - [x] **#14 Página pública dónde se puedan ver las partes:** Completado.
-        - [x] **#16 Al entrar pueden tener algún tipo de categorías para dividir según el tipo de partes del auto:** Completado (filtrado por "tipo de parte" en catálogo público).
-        - [x] **#17 Al darle clic a categoría aparezcan un listado con imágenes miniaturas de la partes del auto:** Completado.
-        - [x] **#18 Que al darle clic a una opción o item del rastro puedan ver el detalle de la parte del auto, el costo y las unidades existentes:** Completado.
-        - [x] **#20 Emitir factura con ITBMS:** Completado (Factura PDF con ITBMS calculado y desglosado).
-        - [x] **#21 El sistema debe reducir el inventario al darse una compra de alguna parte del auto:** Completado.
-        - [x] **#22 Cada módulo debe tener una clase con atributos, métodos y comportamientos:** Completado.
-        - [x] **#23 El sistema debe contar con css y menús horizontales. Cada módulo debe permitir regresar al menú principal (HOME):** Completado.
-        - [x] **Preparación de DB y modelos (`Role`/`User`) para permisos granulares.**
-        - [x] **Configuración de `BaseController::hasPermission()` y `UserController::login()` para manejar permisos granulares.**
-        - [x] **Implementación de permisos granulares en `RoleController` (gestión de roles).**
-        - [x] **Implementación de permisos granulares en `SectionController` (gestión de secciones).**
-        - [x] **Implementación de permisos granulares en `PartController` (gestión de inventario).**
-        - [x] **Implementación de permisos granulares en `ReportController` (visualización de reportes).**
-        - [x] **Implementación de permisos granulares en `SaleController` (gestión de ventas).**
-        - [x] **Modificación del header del administrador para mostrar/ocultar enlaces basados en permisos de sesión.**
-        - [x] **Implementación de Exportación de Inventario a CSV.**
-
+        - [x] **#15 & #19 Compra Virtual y Carrito de Compras (Core):** Implementación de la lógica de sesión del carrito, añadir/actualizar/eliminar productos, y proceso de checkout con registro de ventas y actualización de stock.
+        - [x] **Interfaz de Usuario para Carrito:** Creación de vistas para carrito y éxito de compra, y integración en la navegación pública.
+        - [x] **Redirección Post-Login a Checkout:** Habilitada la funcionalidad para redirigir al usuario al checkout después de iniciar sesión si lo intentó previamente.
+        - [x] **Manejo de Parámetros GET en Router:** Implementada una solución robusta en `public/index.php` para asegurar que los parámetros GET de la URL sean correctamente accesibles en los controladores.
+        - [x] **Corrección de Error de Parámetros SQL (`Invalid parameter number`) en `Part::searchBySection`:** Identificado y corregido el error que impedía el correcto binding de parámetros en la consulta de búsqueda por sección.
+        - [x] **Corrección de Errores de Cabeceras (`headers already sent`):** Identificada y corregida la salida prematura en `CartController.php` y el manejo de `display_errors` para una depuración más limpia.
+        - [x] **Generación de Factura HTML para Checkout del Carrito:** Implementada la visualización en pantalla de la factura multi-ítem tras la compra.
+        - [x] **Manejo de Errores de Carga de Clases (`InvoiceGenerator`):** Corregido el error `Class "App\Controllers\InvoiceGenerator" not found` en `CartController.php`.
+        - [x] **Corrección de `Método ordersummary no encontrado`:** Reincorporados `orderSummary()` y `downloadInvoice()` en `CartController.php` tras una remoción accidental.
     - **Siguiente Tarea:**
-        - [ ] **#6 Permisos Granulares:** Evaluar si se requiere una implementación más profunda de permisos granulares para acciones muy específicas dentro de módulos (ej. "no puede borrar", "solo puede ver"). (Aunque la visibilidad de módulos principales ya está cubierta).
-        - [ ] **#13 Reportes:** Implementar generación de reportes en formato **Excel** (no CSV).
-        - [ ] **#15 & #19 Compra Virtual y Carrito de Compras:** **(FEATURE GRANDE - Se recomienda abordar como un proyecto separado):** Implementar las tablas de base de datos, lógica de sesión y funcionalidades básicas de un carrito de compras (añadir/quitar productos, ajustar cantidades) y desarrollar un proceso de "checkout".
+        - [ ] **Investigación y Solución del Problema de Filtrado del Inventario Administrativo.**
+        - [ ] **Investigación y Solución del Problema de Descarga de PDF de la Factura.**
+    - **Notas:**
+        - El problema de filtrado de búsqueda en `/admin/inventario` persiste según el último reporte del usuario. Aunque se han corregido los problemas de JS y de `$_GET`, y el error SQL de parámetros, la lista de resultados aún no se actualiza. La depuración muestra la consulta SQL y los parámetros correctos. Se requiere una investigación más profunda para determinar si el problema reside en la ausencia de datos coincidentes en la base de datos o en un problema de lógica en la visualización de los resultados.
+        - La funcionalidad de descarga de PDF de la factura (`InvoiceGenerator::generateMultiItemPdf()`) no está operativa. Se han añadido logs de depuración para identificar la interrupción del proceso. La causa raíz aún no se ha identificado; se sospecha de un problema de "headers already sent" o de la configuración/compatibilidad de FPDF en el entorno.
 
-    - **Notas:** Se recomienda al usuario ejecutar los scripts `ALTER TABLE` necesarios para actualizar la base de datos con los cambios de permisos granulares, según las instrucciones provistas anteriormente. La última versión del código fuente incluye la implementación de todos los permisos granulares y debería funcionar correctamente.```
+
 
