@@ -284,8 +284,7 @@ class CartController extends BaseController
             $order_metadata['order_date']
         );
 
-        unset($_SESSION['latest_order']); // Clear after displaying
-        unset($_SESSION['latest_order_metadata']); // Clear after displaying
+
 
         $this->view('public/cart/order_summary', [
             'pageTitle' => 'Resumen de tu Pedido y Factura',
