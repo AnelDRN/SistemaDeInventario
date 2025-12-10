@@ -138,3 +138,8 @@ Para instalar y ejecutar el proyecto en un entorno de desarrollo local, se requi
 ### Acceso al Sistema:
 *   **Público:** `http://localhost/SistemaDeInventario/public/`
 *   **Administración:** `http://localhost/SistemaDeInventario/public/index.php?/login` (Credenciales por defecto: `admin` / `root2514`)
+
+## Video de Youtube
+
+ **Link** : https://youtu.be/lhBYVqwFel8
+ 
