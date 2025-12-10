@@ -94,12 +94,12 @@ class Role
         }
         return new self(
             $data['id'], 
-            $data['nombre'],
-            (bool)$data['can_manage_users'],
-            (bool)$data['can_manage_roles'],
-            (bool)$data['can_manage_sections'],
-            (bool)$data['can_manage_inventory'],
-            (bool)$data['can_view_reports']
+            $data['nombre']//,
+            //(bool)$data['can_manage_users'],
+            //(bool)$data['can_manage_roles'],
+            //(bool)$data['can_manage_sections'],
+            //(bool)$data['can_manage_inventory'],
+            //(bool)$data['can_view_reports']
         );
     }
 
